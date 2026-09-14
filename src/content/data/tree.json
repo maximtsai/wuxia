@@ -1,0 +1,210 @@
+{
+  "nodes": [
+    {
+      "id": "origin-wanderer",
+      "name": "Wanderer origin",
+      "kind": "origin",
+      "region": "center",
+      "position": { "x": 0, "y": 0 },
+      "connections": ["inner-warrior", "inner-qi", "inner-swiftblade"],
+      "origin": "balanced",
+      "effects": []
+    },
+    {
+      "id": "inner-warrior",
+      "name": "Warrior approach",
+      "kind": "passive",
+      "region": "warrior",
+      "position": { "x": -1, "y": 1 },
+      "connections": ["origin-wanderer", "origin-warrior"],
+      "placeholder": true,
+      "effects": []
+    },
+    {
+      "id": "inner-qi",
+      "name": "Qi approach",
+      "kind": "passive",
+      "region": "qi",
+      "position": { "x": 0, "y": -1 },
+      "connections": ["origin-wanderer", "origin-qi"],
+      "placeholder": true,
+      "effects": []
+    },
+    {
+      "id": "inner-swiftblade",
+      "name": "Swiftblade approach",
+      "kind": "passive",
+      "region": "swiftblade",
+      "position": { "x": 1, "y": 1 },
+      "connections": ["origin-wanderer", "origin-swiftblade"],
+      "placeholder": true,
+      "effects": []
+    },
+    {
+      "id": "origin-warrior",
+      "name": "Warrior origin",
+      "kind": "origin",
+      "region": "warrior",
+      "position": { "x": -2, "y": 2 },
+      "connections": [
+        "inner-warrior",
+        "outer-warrior",
+        "bridge-iron-body",
+        "bridge-weapon-tempo"
+      ],
+      "origin": "warrior",
+      "effects": []
+    },
+    {
+      "id": "origin-qi",
+      "name": "Qi Adept origin",
+      "kind": "origin",
+      "region": "qi",
+      "position": { "x": 0, "y": -2 },
+      "connections": [
+        "inner-qi",
+        "outer-qi",
+        "bridge-iron-body",
+        "bridge-shadow-arts"
+      ],
+      "origin": "caster",
+      "effects": []
+    },
+    {
+      "id": "origin-swiftblade",
+      "name": "Swiftblade origin",
+      "kind": "origin",
+      "region": "swiftblade",
+      "position": { "x": 2, "y": 2 },
+      "connections": [
+        "inner-swiftblade",
+        "outer-swiftblade",
+        "bridge-shadow-arts",
+        "bridge-weapon-tempo"
+      ],
+      "origin": "shadow",
+      "effects": []
+    },
+    {
+      "id": "outer-warrior",
+      "name": "Advanced Warrior path",
+      "kind": "passive",
+      "region": "warrior",
+      "position": { "x": -3, "y": 3 },
+      "connections": [
+        "origin-warrior",
+        "capstone-warrior",
+        "technique-avenger"
+      ],
+      "placeholder": true,
+      "effects": []
+    },
+    {
+      "id": "outer-qi",
+      "name": "Advanced Qi path",
+      "kind": "passive",
+      "region": "qi",
+      "position": { "x": 0, "y": -3 },
+      "connections": ["origin-qi", "capstone-qi"],
+      "placeholder": true,
+      "effects": []
+    },
+    {
+      "id": "outer-swiftblade",
+      "name": "Advanced Swiftblade path",
+      "kind": "passive",
+      "region": "swiftblade",
+      "position": { "x": 3, "y": 3 },
+      "connections": ["origin-swiftblade", "capstone-swiftblade"],
+      "placeholder": true,
+      "effects": []
+    },
+    {
+      "id": "capstone-warrior",
+      "name": "Warrior capstone placeholder",
+      "kind": "vow",
+      "region": "warrior",
+      "position": { "x": -4, "y": 4 },
+      "connections": ["outer-warrior"],
+      "placeholder": true,
+      "effects": []
+    },
+    {
+      "id": "capstone-qi",
+      "name": "Qi capstone placeholder",
+      "kind": "vow",
+      "region": "qi",
+      "position": { "x": 0, "y": -4 },
+      "connections": ["outer-qi"],
+      "placeholder": true,
+      "effects": []
+    },
+    {
+      "id": "capstone-swiftblade",
+      "name": "Swiftblade capstone placeholder",
+      "kind": "vow",
+      "region": "swiftblade",
+      "position": { "x": 4, "y": 4 },
+      "connections": ["outer-swiftblade"],
+      "placeholder": true,
+      "effects": []
+    },
+    {
+      "id": "bridge-iron-body",
+      "name": "Iron-body bridge",
+      "kind": "passive",
+      "region": "iron-body",
+      "position": { "x": -2, "y": 0 },
+      "connections": ["origin-warrior", "origin-qi"],
+      "placeholder": true,
+      "effects": []
+    },
+    {
+      "id": "bridge-shadow-arts",
+      "name": "Shadow-arts bridge",
+      "kind": "passive",
+      "region": "shadow-arts",
+      "position": { "x": 2, "y": 0 },
+      "connections": ["origin-qi", "origin-swiftblade"],
+      "placeholder": true,
+      "effects": []
+    },
+    {
+      "id": "bridge-weapon-tempo",
+      "name": "Weapon-tempo bridge",
+      "kind": "passive",
+      "region": "weapon-tempo",
+      "position": { "x": 0, "y": 3 },
+      "connections": ["origin-swiftblade", "origin-warrior"],
+      "placeholder": true,
+      "effects": []
+    },
+    {
+      "id": "technique-avenger",
+      "name": "Avenger",
+      "description": "Unlocks Avenger: deal 250% of your missing Life to one enemy.",
+      "kind": "technique",
+      "region": "warrior",
+      "position": { "x": -4, "y": 2.5 },
+      "connections": ["outer-warrior", "avenger-third-use"],
+      "effects": [{ "type": "grantSkill", "skill": "avenger", "rank": 1 }]
+    },
+    {
+      "id": "avenger-third-use",
+      "name": "Avenger: Third Reckoning",
+      "description": "Avenger gains a third use per encounter.",
+      "kind": "mastery",
+      "region": "warrior",
+      "position": { "x": -5, "y": 2 },
+      "connections": ["technique-avenger"],
+      "effects": [
+        {
+          "type": "skillModifier",
+          "skill": "avenger",
+          "field": "uses",
+          "amount": 1
+        }
+      ]
+    }
+  ]
+}

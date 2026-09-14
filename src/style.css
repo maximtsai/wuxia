@@ -1,0 +1,1132 @@
+:root {
+  color-scheme: dark;
+  font-family: system-ui, sans-serif;
+  background: #111820;
+  color: #e1e8ee;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+header {
+  max-width: 1200px;
+  margin: auto;
+  padding: 18px 24px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+h1 {
+  font-size: 22px;
+  margin: 0;
+}
+h2 {
+  font-size: 20px;
+  margin: 0 0 10px;
+}
+header span,
+.muted {
+  color: #aab8c5;
+  font-size: 14px;
+}
+main {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 20px 24px;
+}
+#game {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  overflow: hidden;
+  max-height: 48vh;
+}
+#game canvas {
+  display: block;
+}
+#interface {
+  padding-top: 16px;
+}
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  padding: 12px 0;
+  font-variant-numeric: tabular-nums;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: #273746;
+  border: 1px solid #536779;
+  border-radius: 5px;
+  padding: 10px 16px;
+  min-height: 44px;
+  cursor: pointer;
+}
+button:hover:not(:disabled) {
+  background: #364d60;
+}
+button:focus-visible {
+  outline: 3px solid #99c9c0;
+  outline-offset: 3px;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.action {
+  text-align: left;
+  flex: 1 1 155px;
+}
+.action small {
+  display: block;
+  margin-top: 4px;
+}
+.columns {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 24px;
+}
+.panel {
+  border-top: 1px solid #3a4b5b;
+  padding-top: 14px;
+}
+ol {
+  margin: 8px 0;
+  padding-left: 22px;
+  line-height: 1.6;
+}
+#notice {
+  min-height: 24px;
+  color: #b3dbcf;
+}
+@media (max-width: 640px) {
+  header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px;
+  }
+  main {
+    padding: 0 12px 16px;
+  }
+  .columns {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  #game {
+    max-height: none;
+  }
+  .action {
+    flex-basis: 42%;
+  }
+}
+/* Overworld HUD: positions follow references/overworld-ui-concept.png. */
+main.overworld {
+  position: relative;
+  max-width: 1600px;
+  width: min(100%, calc((100vh - 85px) * 16 / 9));
+  padding: 0;
+  margin: 0 auto;
+}
+.overworld #game {
+  max-height: none;
+}
+.overworld #interface {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  pointer-events: none;
+  font-size: clamp(12px, 1.1vw, 16px);
+}
+.overworld #interface button,
+.overworld .glass {
+  pointer-events: auto;
+}
+.glass {
+  background: #151d25ee;
+  border: 1px solid #53606a;
+  border-radius: 9px;
+  padding: 12px;
+}
+.player-hud {
+  position: absolute;
+  top: 2%;
+  left: 1.5%;
+  width: 27%;
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 12px;
+}
+.portrait {
+  display: grid;
+  place-items: center;
+  width: 45px;
+  height: 58px;
+  background: #34464b;
+  color: #a9d2c7;
+  font-size: 28px;
+  border-radius: 5px;
+}
+.player-resources {
+  flex: 1;
+  min-width: 0;
+}
+.resource {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px 4px;
+  margin: 5px 0;
+  font-size: 12px;
+}
+.resource strong {
+  text-align: right;
+}
+.resource meter {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 9px;
+}
+.resource meter::-webkit-meter-bar {
+  background: #333d46;
+  border: none;
+}
+.life meter::-webkit-meter-optimum-value {
+  background: #8ec7a0;
+}
+.mana meter::-webkit-meter-optimum-value {
+  background: #80b9df;
+}
+.energy meter::-webkit-meter-optimum-value {
+  background: #d7b877;
+}
+.room-title {
+  position: absolute;
+  top: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 15px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.world-tools {
+  position: absolute;
+  top: 2%;
+  right: 1.5%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 6px 10px;
+}
+.world-tools .stats {
+  color: #ebcb7c;
+  padding: 0;
+}
+.gate-service {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+.gate-service small {
+  display: block;
+  background: #151d25;
+  padding: 5px;
+}
+.healer-service {
+  position: absolute;
+  left: 21%;
+  top: 40%;
+}
+.save-service {
+  position: absolute;
+  right: 4%;
+  top: 44%;
+  display: grid;
+  gap: 5px;
+}
+.healer-service small,
+.save-service small {
+  display: block;
+  margin-bottom: 5px;
+  color: #b6c2ca;
+}
+.world-hint {
+  position: absolute;
+  bottom: 2%;
+  left: 1.5%;
+}
+.world-dock {
+  position: absolute;
+  bottom: 2%;
+  right: 1.5%;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+.potions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+  font-size: 12px;
+}
+.potions small {
+  grid-column: 1 / -1;
+  color: #9facb7;
+}
+.equipped-summary {
+  position: absolute;
+  bottom: 13%;
+  right: 2%;
+  font-size: 12px;
+  color: #aab8c5;
+}
+.world-notice {
+  position: absolute;
+  bottom: -40px;
+  left: 12px;
+  margin: 0;
+  font-size: 12px;
+}
+.world-modal {
+  position: absolute;
+  top: 23%;
+  right: 2%;
+  width: 350px;
+  max-width: 48%;
+  max-height: 65%;
+  overflow-y: auto;
+  pointer-events: auto;
+  box-shadow: 0 8px 50px #0009;
+}
+@media (max-width: 760px) {
+  main.overworld {
+    width: 100%;
+  }
+  .overworld #interface {
+    position: relative;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .overworld #interface > * {
+    position: static;
+    transform: none;
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
+  .overworld .player-hud,
+  .world-dock,
+  .world-notice,
+  .world-modal,
+  .world-hint,
+  .equipped-summary {
+    grid-column: 1 / -1;
+  }
+  .world-modal {
+    max-height: none;
+  }
+  .world-tools {
+    justify-content: space-between;
+  }
+  .room-title {
+    align-self: center;
+    font-size: 13px;
+  }
+  .world-dock {
+    flex-wrap: wrap;
+  }
+  .world-notice {
+    min-height: 0;
+  }
+  .resource {
+    font-size: 14px;
+  }
+}
+.seller-service {
+  position: absolute;
+  left: 22%;
+  top: 72%;
+  display: flex;
+  gap: 8px;
+}
+.combat-log {
+  max-height: 300px;
+  overflow-y: auto;
+}
+.potion-offer {
+  padding: 12px 0;
+  border-top: 1px solid #53606a;
+}
+.intent {
+  border-left: 3px solid #d7b877;
+  padding-left: 12px;
+}
+@media (max-width: 760px) {
+  .seller-service {
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+  }
+}
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+.skill-button {
+  text-align: left;
+  min-width: 0;
+  padding: 10px;
+}
+.skill-button small {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+}
+.selected {
+  border-color: #99c9c0;
+  box-shadow: inset 0 0 0 1px #99c9c0;
+}
+.basic-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.action-preview {
+  background: #1c2a35;
+  border: 1px solid #526574;
+  border-radius: 8px;
+  padding: 14px;
+}
+.target-row {
+  display: flex;
+  gap: 12px;
+}
+.target-card {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #526574;
+  border-radius: 8px;
+}
+.gate-service {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.healer-service {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.class-choice {
+  top: 16%;
+  max-height: 76%;
+  background: #151d25;
+}
+.world-modal small {
+  display: block;
+  margin: 5px 0;
+}
+@media (min-width: 1000px) {
+  .skill-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+  .skill-button {
+    font-size: 13px;
+  }
+  .target-card p,
+  .action-preview p {
+    margin: 8px 0;
+  }
+}
+@media (max-width: 760px) {
+  .skill-grid {
+    gap: 4px;
+  }
+  .skill-button {
+    font-size: 11px;
+    padding: 6px;
+  }
+  .skill-button small {
+    font-size: 10px;
+  }
+  .basic-actions {
+    grid-template-columns: 1fr;
+  }
+  .target-row {
+    flex-wrap: wrap;
+  }
+  .target-card {
+    min-width: 140px;
+  }
+}
+
+/* Phase 3 room services and explicit connected exits. */
+.room-services {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 42%;
+}
+.room-exits {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.room-exits > div {
+  position: absolute;
+  max-width: 24%;
+  pointer-events: auto;
+}
+.room-exits small {
+  display: block;
+  background: #151d25;
+  padding: 4px;
+}
+.exit-up {
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.exit-down {
+  bottom: 19%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.exit-left {
+  top: 57%;
+  left: 1%;
+}
+.exit-right {
+  top: 57%;
+  right: 1%;
+}
+.world-modal {
+  z-index: 5;
+  background: #151d25;
+}
+.map-modal {
+  width: 90%;
+  max-width: 90%;
+  right: 5%;
+  top: 15%;
+  max-height: 80%;
+}
+/* Skill tree screen (Skills in the overworld dock). */
+.tree-modal {
+  width: 94%;
+  max-width: 94%;
+  right: 3%;
+  top: 11%;
+  height: 86%;
+  max-height: 86%;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 8px;
+  overflow: hidden;
+}
+.tree-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+}
+.tree-head h2,
+.tree-head p {
+  margin: 0;
+}
+.tree-head p {
+  color: #d7b877;
+}
+.tree-head .controls {
+  margin: 0 0 0 auto;
+}
+.tree-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: #aab8c5;
+}
+.tree-legend span {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 50%;
+  border: 2px solid #99c9c0;
+}
+.tree-legend .allocated span {
+  background: #99c9c0;
+}
+.tree-legend .available span {
+  box-shadow: 0 0 6px #d7b877;
+  border-color: #d7b877;
+}
+.tree-legend .reachable span {
+  opacity: 0.8;
+}
+.tree-legend .locked span {
+  opacity: 0.4;
+}
+.tree-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 30%);
+  gap: 14px;
+  min-height: 0;
+}
+.tree-canvas {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 10px 10px 18px;
+  background: #10161d;
+  border: 1px solid #2f3c47;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tree-board {
+  position: relative;
+  height: 100%;
+  max-width: 100%;
+}
+.tree-board svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.tree-edge {
+  stroke: #3f4d59;
+  stroke-width: 3;
+}
+.tree-edge.active {
+  stroke: #d7b877;
+  stroke-width: 4;
+}
+.tree-node {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  min-height: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.tree-node:hover:not(:disabled) {
+  background: none;
+}
+.tree-node-mark {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--region);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--region) 20%, #151d25);
+  transition: transform 0.12s;
+}
+.tree-node.kind-origin .tree-node-mark {
+  width: 36px;
+  height: 36px;
+  box-shadow:
+    inset 0 0 0 3px #151d25,
+    inset 0 0 0 6px var(--region);
+}
+.tree-node.kind-technique .tree-node-mark,
+.tree-node.kind-mastery .tree-node-mark,
+.tree-node.kind-discipline .tree-node-mark {
+  border-radius: 7px;
+}
+.tree-node.kind-vow .tree-node-mark {
+  width: 25px;
+  height: 25px;
+  border-radius: 4px;
+  transform: rotate(45deg);
+}
+.tree-node-name {
+  position: absolute;
+  top: 88%;
+  left: 50%;
+  width: max-content;
+  max-width: 120px;
+  transform: translateX(-50%);
+  font-size: 11px;
+  line-height: 1.15;
+  color: #c4d0d9;
+  text-align: center;
+  text-shadow: 0 1px 3px #000;
+  pointer-events: none;
+}
+.tree-node.allocated .tree-node-mark {
+  background: var(--region);
+  box-shadow: 0 0 14px var(--region);
+}
+.tree-node.kind-origin.allocated .tree-node-mark {
+  box-shadow:
+    inset 0 0 0 3px #151d25,
+    0 0 14px var(--region);
+}
+.tree-node.available .tree-node-mark {
+  box-shadow:
+    0 0 0 3px #d7b87788,
+    0 0 16px #d7b87766;
+}
+.tree-node.available:hover .tree-node-mark {
+  transform: scale(1.12);
+}
+.tree-node.kind-vow.available:hover .tree-node-mark {
+  transform: rotate(45deg) scale(1.12);
+}
+.tree-node.reachable {
+  opacity: 0.8;
+}
+.tree-node.locked,
+.tree-node.junction {
+  opacity: 0.42;
+}
+.tree-node.selected {
+  opacity: 1;
+}
+.tree-node.selected .tree-node-mark {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+.tree-details {
+  min-height: 0;
+  overflow-y: auto;
+}
+.tree-details h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+.tree-details h3 + .muted {
+  margin-top: 0;
+  text-transform: capitalize;
+}
+.tree-details > button {
+  width: 100%;
+}
+.tree-details h3:not(:first-child) {
+  margin-top: 18px;
+}
+.tree-effects {
+  margin: 8px 0;
+  padding-left: 18px;
+  line-height: 1.5;
+}
+.tree-owned {
+  color: #8ec7a0;
+  font-weight: 600;
+}
+.tree-hint {
+  font-size: 12px;
+}
+@media (max-width: 760px) {
+  .overworld .tree-modal {
+    display: block;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+  .tree-head .controls {
+    margin: 8px 0 0;
+  }
+  .tree-legend {
+    margin: 8px 0;
+  }
+  .tree-layout {
+    grid-template-columns: 1fr;
+  }
+  .tree-board {
+    width: 100%;
+    height: auto;
+  }
+  .tree-node-name {
+    max-width: 72px;
+    font-size: 9px;
+  }
+}
+.temple-map {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.map-room {
+  border: 1px solid #536779;
+  border-radius: 4px;
+  padding: 8px;
+}
+.map-room[data-room='rift'] {
+  grid-area: 1 / 1;
+}
+.map-room[data-room='training'] {
+  grid-area: 1 / 3;
+}
+.map-room[data-room='riftEntry'] {
+  grid-area: 2 / 1;
+}
+.map-room[data-room='statue'] {
+  grid-area: 2 / 2;
+}
+.map-room[data-room='monster'] {
+  grid-area: 2 / 3;
+}
+.map-room[data-room='library'] {
+  grid-area: 3 / 1;
+}
+.map-room[data-room='advanced'] {
+  grid-area: 3 / 2;
+}
+.map-room[data-room='upstairs'] {
+  grid-area: 3 / 3;
+}
+.map-room[data-room='human'] {
+  grid-area: 4 / 1;
+}
+.map-room[data-room='potions'] {
+  grid-area: 4 / 2;
+}
+.map-room[data-room='merchant'] {
+  grid-area: 4 / 3;
+}
+.map-room[data-room='entry'] {
+  grid-area: 5 / 2;
+}
+.map-room[data-room='ending'] {
+  grid-area: 6 / 2;
+}
+@media (max-width: 760px) {
+  .room-services,
+  .room-exits {
+    grid-column: 1 / -1;
+  }
+  .overworld .room-services {
+    max-width: none;
+  }
+  .room-exits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .room-exits > div {
+    position: static;
+    max-width: none;
+    transform: none;
+  }
+  .overworld .map-modal {
+    max-height: none;
+  }
+  .temple-map {
+    gap: 4px;
+    font-size: 11px;
+  }
+  .map-room {
+    padding: 4px;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (min-width: 761px) {
+  .overworld .save-service {
+    top: 13%;
+    right: 1.5%;
+  }
+  .map-room small {
+    font-size: 11px;
+    line-height: 1.2;
+    margin: 3px 0;
+  }
+  .map-room {
+    font-size: 12px;
+    padding: 6px;
+  }
+}
+
+/* Opening screen: artwork is isolated from the replaceable world theme. */
+.choosing-class {
+  background: #10151d;
+}
+.choosing-class > header,
+.choosing-class #game {
+  display: none;
+}
+.choosing-class main {
+  width: 100%;
+  max-width: 1080px;
+  padding: 28px 32px 16px;
+}
+.choosing-class #interface {
+  padding: 0;
+}
+.class-screen {
+  min-height: calc(100svh - 44px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.class-heading {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.class-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 10px;
+  color: #a1a8b4;
+}
+.class-heading h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin: 10px 0;
+}
+.class-heading p {
+  color: #9ba6b5;
+  margin: 0;
+  font-size: 14px;
+}
+.class-columns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.class-column {
+  position: relative;
+  height: clamp(310px, 52vh, 400px);
+  min-width: 0;
+  border: 1px solid #39414e;
+  border-radius: 8px;
+  background: #181e28;
+  isolation: isolate;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+.class-column > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+  border-radius: 7px;
+  filter: grayscale(1) brightness(0.65);
+  transition: filter 0.3s;
+}
+.class-shade {
+  position: absolute;
+  inset: 0;
+  border-radius: 7px;
+  background: linear-gradient(transparent 30%, #10151d66 55%, #10151df5 88%);
+  pointer-events: none;
+}
+.class-number {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #ccd3dd;
+}
+.class-caption {
+  position: absolute;
+  inset: auto 14px 14px;
+}
+.class-caption h2 {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  font-size: 23px;
+  margin: 0 0 4px;
+}
+.class-caption p {
+  font-size: 11px;
+  color: #adb5c3;
+  margin: 0 0 14px;
+}
+.class-caption button {
+  width: 100%;
+  padding: 8px 6px;
+  font-size: 12px;
+  background: #161d27e8;
+  border-color: #525b68;
+}
+.class-caption button span {
+  float: right;
+  margin-right: 4px;
+}
+.class-column:hover,
+.class-column:focus,
+.class-column:focus-within {
+  border-color: var(--class-accent);
+  box-shadow: 0 0 26px color-mix(in srgb, var(--class-accent) 23%, transparent);
+  outline: none;
+  transform: translateY(-3px);
+  z-index: 2;
+}
+.class-column:hover > img,
+.class-column:focus > img,
+.class-column:focus-within > img {
+  filter: grayscale(0) brightness(1);
+}
+.class-column:hover h2,
+.class-column:focus h2,
+.class-column:focus-within h2 {
+  color: var(--class-accent);
+}
+.class-tooltip {
+  position: absolute;
+  bottom: 125px;
+  left: 12px;
+  right: 12px;
+  background: #0e141df2;
+  border: 1px solid var(--class-accent);
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition:
+    opacity 0.18s,
+    transform 0.18s;
+  pointer-events: none;
+}
+.class-tooltip strong {
+  color: var(--class-accent);
+}
+.class-tooltip p {
+  margin: 6px 0 10px;
+}
+.class-tooltip small {
+  color: #acb8c8;
+  font-size: 10px;
+}
+.class-column:hover .class-tooltip,
+.class-column:focus .class-tooltip,
+.class-column:focus-within .class-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.class-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-top: 20px;
+}
+.class-footer p {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #96a1b1;
+  margin: 0;
+}
+.class-footer button {
+  font-size: 12px;
+  background: transparent;
+}
+.class-screen #notice {
+  margin: 12px 0 0;
+  font-size: 12px;
+  text-align: center;
+}
+@media (max-width: 600px) {
+  .choosing-class main {
+    padding: 24px 16px;
+  }
+  .class-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .class-column {
+    height: 340px;
+  }
+  .class-caption {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+  }
+  .class-caption h2 {
+    font-size: 21px;
+  }
+  .class-tooltip {
+    left: 6px;
+    right: 6px;
+    bottom: 116px;
+    font-size: 11px;
+    padding: 9px;
+  }
+  .class-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .class-column,
+  .class-column > img,
+  .class-tooltip {
+    transition: none;
+    transform: none;
+  }
+}
+
+@media (min-width: 1000px) {
+  .class-tooltip {
+    width: 250px;
+    left: calc(100% + 10px);
+    right: auto;
+    bottom: 60px;
+  }
+  .class-column:last-child .class-tooltip {
+    left: auto;
+    right: calc(100% + 10px);
+  }
+}
+
+/* Keep brushwork saturated enough to read; tooltips use an opaque paper-dark panel. */
+.class-tooltip {
+  background: #101720;
+}
+@media (max-width: 600px) {
+  .class-columns:has(.class-column:focus-within)
+    .class-column:not(:focus-within)
+    .class-tooltip {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+html.reduced-motion *,
+html.reduced-motion *::before,
+html.reduced-motion *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
