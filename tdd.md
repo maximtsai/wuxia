@@ -368,9 +368,15 @@ Some techniques may be used only a limited number of times per encounter.
 - This is not a cooldown: uses do not recharge over turns. General cooldowns remain
   excluded unless separately approved as a labeled successor mechanic.
 
-**Candidate:** Which techniques are limited and their counts. **Open:** Whether an
-evolution inherits, changes, or removes its base technique's limit, and how limits
-behave in Training Ward sessions.
+**Implemented:** Avenger is limited to 2 uses per encounter, and its child mastery
+node (Avenger: Third Reckoning) raises the limit to 3. Tree nodes may add uses to a
+limited technique but never limit an unlimited one. Battle buttons show remaining
+and maximum uses. An exhausted technique keeps its position and explains "No uses
+left". The selected-action preview does not show uses yet.
+
+**Candidate:** Which other techniques are limited and their counts. **Open:** Whether
+an evolution inherits, changes, or removes its base technique's limit, and how limits
+behave in Training Ward sessions (currently the same as normal encounters).
 
 ### 4.5 Action dock and technique buttons — Approved
 
@@ -843,6 +849,27 @@ automated balance or build-viability simulations while mechanics are in flux.**
 
 Acceptance records for completed phases are in [docs/history.md](docs/history.md).
 
+**Phase 3.5 — implemented so far:**
+
+- Shared-tree content lives in `src/content/data/tree.json` and `skills.json`. Both
+  are validated at startup and editable in the dev-only content editor
+  (`npm run editor`). Tree nodes can carry stat, stat-percentage, grant-skill,
+  skill-modifier, and flag effects that apply in combat and derived stats.
+- An overworld **Skills** screen shows the tree and allocates connected nodes from the
+  class origin. It links to the legacy technique ranks.
+- The Mentor respec is a full tree reset (§3.4), refunding every node along with
+  ranks and stat choices.
+- Limited-use techniques (§4.4), first applied to Avenger: 0 Qi, 2 uses, and base
+  power equal to 250% of missing Life. The `technique-avenger` node grants it, and its
+  child mastery adds a third use.
+- Saves record a content hash. Saves made against earlier content refund invalid
+  nodes and ranks instead of failing to load.
+
+**Interim:** Tree nodes currently spend the legacy Skill Point pool shared with ranks,
+so the initial point is never counted twice. A new character's point pays for the
+free starter rank, so the first tree point arrives at level 2 rather than at creation
+(§3.3). Most tree nodes are still placeholders.
+
 **Phase 3.5 — approved, not yet implemented:**
 
 - Replace legacy ranks with the final shared tree, techniques, and explicit tree-point
@@ -852,7 +879,9 @@ Acceptance records for completed phases are in [docs/history.md](docs/history.md
 - Tree node gradient: stat nodes between abilities, fundamental center nodes (Qi
   recovery toward Qi Adept, Life recovery toward Warrior, Quick Draught toward
   Swiftblade), extreme edge nodes with drawbacks.
-- Limited-use techniques.
+- Tree text search and filters (§3.3).
+- Limited-use counts for techniques beyond Avenger, and showing uses in the action
+  preview.
 - Non-replayable Human Gateway stages.
 - Removal of boss-specific damage caps.
 - Very cheap respec pricing.
@@ -863,17 +892,18 @@ Acceptance records for completed phases are in [docs/history.md](docs/history.md
 
 ## 12. Open questions
 
-| Topic               | Question                                                                                   |
-| ------------------- | ------------------------------------------------------------------------------------------ |
-| Center nodes        | Do further fundamental nodes sit between the specialist directions?                        |
-| Limited-use moves   | Which techniques are limited, their counts, evolution inheritance, Training Ward behavior? |
-| Starting stats      | Exact successor starting stats per class.                                                  |
-| Catch-up path       | Are Training Ward and mini-quests enough repeatable EXP/gold with Human stages locked?     |
-| Mini-quests         | Content, rewards, gating, and count per campaign section.                                  |
-| Respec price        | Exact "very cheap" price.                                                                  |
-| Potions             | Names, prices, capacities, buffs, duplicates, starting bottles, stacking.                  |
-| Energy              | Capacity growth and food/restoration amounts.                                              |
-| Training Ward       | Shield-breaking-hit boundary and non-damaging-action exploit resistance.                   |
-| Crit constants      | Base chance, cap, multiplier, eligible action types.                                       |
-| Monster/Rift replay | Do replays grant full normal rewards, or reduced rewards?                                  |
-| Equipment           | Item identities, unique stage rewards, and replay eligibility.                             |
+| Topic               | Question                                                                                                                                                      |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Center nodes        | Do further fundamental nodes sit between the specialist directions?                                                                                           |
+| Limited-use moves   | Beyond Avenger (2 uses, 3 with its mastery): which techniques are limited, their counts, evolution inheritance, Training Ward behavior?                       |
+| Tree points         | Until ranks are removed, should tree nodes keep sharing the legacy Skill Point pool (first tree point at level 2), or get separate tree-point accounting now? |
+| Starting stats      | Exact successor starting stats per class.                                                                                                                     |
+| Catch-up path       | Are Training Ward and mini-quests enough repeatable EXP/gold with Human stages locked?                                                                        |
+| Mini-quests         | Content, rewards, gating, and count per campaign section.                                                                                                     |
+| Respec price        | Exact "very cheap" price.                                                                                                                                     |
+| Potions             | Names, prices, capacities, buffs, duplicates, starting bottles, stacking.                                                                                     |
+| Energy              | Capacity growth and food/restoration amounts.                                                                                                                 |
+| Training Ward       | Shield-breaking-hit boundary and non-damaging-action exploit resistance.                                                                                      |
+| Crit constants      | Base chance, cap, multiplier, eligible action types.                                                                                                          |
+| Monster/Rift replay | Do replays grant full normal rewards, or reduced rewards?                                                                                                     |
+| Equipment           | Item identities, unique stage rewards, and replay eligibility.                                                                                                |
