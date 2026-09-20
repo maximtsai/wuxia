@@ -1,0 +1,5 @@
+# Qi Adept reference pose revision
+
+Generated with the built-in image generation tool using the user-provided reference. Supersedes the asymmetric guard portrait. Saved to public/images/classes/caster-stick-wuxia.png.
+
+Edit the supplied image with ONLY TWO subtle changes: 1. Replace both fingered hands with simple rounded black ball hands, similar in width to the thick forearms, with no fingers or thumbs. Keep both arms in exactly the same spread Tai Chi pose and positions as this reference. 2. Narrow the stance ONLY SLIGHTLY, about 5 percent total, by moving each foot a tiny amount inward. Preserve the low hips, deeply bent image-right knee, extended image-left leg and original body height; do not turn this into a tall stance. Preserve everything else: black stick silhouette, head, limb shapes and brush texture, white headband and sash, sweeping overhead qi ribbon, vibrant blue background, composition and vertical 2:3 framing. Do not redesign the pose, bend arms into a guard, or shrink the qi arc. No additional details or text.

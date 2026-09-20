@@ -282,10 +282,20 @@ export function actionInfo(s: Session, id: CombatAction): ActionInfo {
     };
   const d: Skill = effectiveSkill(s.player, id),
     rank = skillRank(s.player, id);
-  const power = calculateActionPower(s.player, d, id, rank, s.player.mana);
+  const target = s.battle?.enemies.find(
+    (e) => e.id === s.battle?.selectedTarget && e.life > 0,
+  );
+  const power = calculateActionPower(
+    s.player,
+    d,
+    id,
+    rank,
+    s.player.mana,
+    target,
+  );
   return {
     name: d.name,
-    detail: `${d.description}${d.hits ? ` Base power ${Math.floor(power)} per hit before defense and critical.` : ''} Rank ${rank}/10. Requires level ${d.level}${d.requires.length ? ', ' + d.requires.map((v) => skills[v as SkillId].name).join(', ') : ''}.`,
+    detail: `${d.description}${d.percent !== undefined ? ` Deals ${d.percent}% of ${d.effect === 'avenger' ? 'your missing Life' : "the target's current Life"}.` : ''}${d.noCrit ? ' Cannot critically strike.' : ''}${d.hits ? ` Base power ${Math.floor(power)} per hit before defense and critical.` : ''} Rank ${rank}/10. Requires level ${d.level}${d.requires.length ? ', ' + d.requires.map((v) => skills[v as SkillId].name).join(', ') : ''}.`,
     cost: d.cost,
     target: d.target,
     uses:
@@ -610,9 +620,9 @@ export function act(
             break;
           }
           const unshielded = e.shield === 0;
-          const power = calculateActionPower(p, d, id, rank, mana);
+          const power = calculateActionPower(p, d, id, rank, mana, e);
           const weak = b.statuses.some((v) => v.kind === 'weaken') ? 0.75 : 1,
-            crit = random() < criticalChance(effectiveSpeed(p));
+            crit = !d.noCrit && random() < criticalChance(effectiveSpeed(p));
           if (crit) log(s, 'Critical strike!');
           if (training) p.energy -= training.cost;
           hit(

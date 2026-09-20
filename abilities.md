@@ -68,7 +68,7 @@ is unambiguous.
 | `manaBomb`        | Qi Burst               | Mana Bomb             |
 | `heal`            | Heal                   | Heal                  |
 | `avenger`         | Avenger                | Avenger               |
-| `split`           | Split                  | Split                 |
+| `split`           | Cut Down               | Split                 |
 | `shadowStrike`    | Shadow Strike          | Shadow Strike         |
 | `annihilate`      | Annihilate             | Annihilate            |
 | `execution`       | Execution              | Execution             |
@@ -118,14 +118,14 @@ normal damage before critical and target mitigation are applied.
 ## Successor shared-tree design
 
 All origins use one visible, connected passive tree. Wanderer starts at the center.
-Warrior, Qi Adept, and Swiftblade each start roughly midway between the center and
+Warrior, Cultivator, and Windstep each start roughly midway between the center and
 the outer edge of their themed region—not at its endpoint. From a specialist start,
 traveling inward leads toward hybrid and cross-archetype options, while traveling
 outward leads through deeper specialization to that archetype's most advanced
 techniques, Disciplines, and Vow capstones.
 
 The perimeter still links adjacent themes through three hybrid bridges: Warrior–Qi
-is iron-body, Qi–Swiftblade is shadow arts, and Swiftblade–Warrior is weapon tempo.
+is iron-body, Qi–Windstep is shadow arts, and Windstep–Warrior is weapon tempo.
 Wanderer reaches the specialist starting rings quickly but requires more total
 investment to reach any furthest-edge capstone.
 
@@ -137,9 +137,9 @@ investment to reach any furthest-edge capstone.
   class organically grows different stats from the nodes around it. All classes share
   identical automatic per-level growth.
 - **Center nodes are fundamental and drawback-free.** Near the Wanderer origin:
-  - a **Qi recovery** node in the direction of the Qi Adept;
+  - a **Qi recovery** node in the direction of the Cultivator;
   - a **Life recovery** node in the direction of the Warrior;
-  - a **Quick Draught** node in the direction of the Swiftblade.
+  - a **Quick Draught** node in the direction of the Windstep.
 
   Qi recovery nodes never modify Basic Attack's fixed 10-Qi restoration.
 
@@ -156,7 +156,7 @@ charge, does not advance statuses or enemy cadence, and resets each encounter an
 Retry prepared. It is an approved exception to potions taking the turn. Full rules are
 in [tdd.md](tdd.md) §3.3.
 
-**Other fundamental node ideas (candidates).** These were not chosen for the Swiftblade
+**Other fundamental node ideas (candidates).** These were not chosen for the Windstep
 direction but could sit between specialist directions or become small passives
 elsewhere. Each respects the approved combat rules: no misses, fixed turn order after
 the opening, Speed affecting only the opening side and critical chance, and Attack's
@@ -218,8 +218,8 @@ fixed learned skill:
 | Origin     | Immediate choices             | Intended early identity                  |
 | ---------- | ----------------------------- | ---------------------------------------- |
 | Warrior    | Stab or Guard Stance          | Direct damage or durable counterplay     |
-| Qi Adept   | Qi Strike or Gather Qi        | Efficient spell damage or burst recovery |
-| Swiftblade | Flying Blades or Speed Strike | Multi-target pressure or fast offense    |
+| Cultivator   | Qi Strike or Gather Qi        | Efficient spell damage or burst recovery |
+| Windstep | Flying Blades or Speed Strike | Multi-target pressure or fast offense    |
 | Wanderer   | First step toward any branch  | Flexible routing with slower capstones   |
 
 Attack is universal and outside the tree, so no origin can be stranded without a
@@ -371,7 +371,7 @@ stats instead of ranks 1–10.
 - **Known bug:** Shuriken rank also controls Double Strike's shield multiplier and
   the principal rank scaling of Shadow Strike and Annihilate.
 - **Successor design:** Retained as early multi-target pressure available near the
-  Swiftblade start. Both targets use the same transparent damage rules. Each hit
+  Windstep start. Both targets use the same transparent damage rules. Each hit
   gains bonus physical damage equal to `0.35×SPD`.
 
 ### Double Strike
@@ -385,7 +385,7 @@ stats instead of ranks 1–10.
   `PD×f + 5×IS`; shield `ESD×(0.62 + 0.08×rShuriken)`; random `R(PD/3)`.
 - **Known bug:** Its shield scaling reads Shuriken rank instead of Double Strike
   rank.
-- **Successor design:** Retained in the Warrior–Swiftblade weapon-tempo bridge.
+- **Successor design:** Retained in the Warrior–Windstep weapon-tempo bridge.
   Each hit gains bonus physical damage equal to `0.30×SPD`. An adjacent evolution
   mastery upgrades it into Execution in the same action slot.
 
@@ -398,7 +398,7 @@ stats instead of ranks 1–10.
 - **Original components:** physical `QD`; Strength `STR`; qi
   `PD + 0.6×SPD×rSpeedStrike + 5×IS`; shield `ESD`; random
   `R(PD/3) + R(5)`.
-- **Successor design:** Retained near the Swiftblade start. Speed improves its
+- **Successor design:** Retained near the Windstep start. Speed improves its
   damage by `1.25×SPD`; it never changes turn order after combat begins.
 
 ### Qi Strike / Energy Shot
@@ -409,7 +409,7 @@ stats instead of ranks 1–10.
 - **Original accuracy input:** `SPD + 5`.
 - **Original components:** physical `QD + 40 + 9×rEnergyShot + 7×EF`;
   random `R(PD/3)`. No Strength, qi, or shield component is documented.
-- **Successor design:** Retained near the Qi Adept start. An adjacent evolution
+- **Successor design:** Retained near the Cultivator start. An adjacent evolution
   mastery upgrades it into Shadow Strike in the same action slot.
 
 ### Blast Fire
@@ -482,8 +482,10 @@ stats instead of ranks 1–10.
   `R(PD/3) + R(10)`.
 - The percentage term uses the target's current Life, making Split strongest early
   in a fight.
-- **Successor design:** Retained as a two-hit technique. The current-Life damage is
-  divided across the two hits and is uncapped against every target, including bosses.
+- **Successor design:** Renamed **Cut Down**. One hit for 30 Qi, with base power equal
+  to 20% of the target's current Life at the moment of the hit. It cannot critically
+  strike; defense and shields still apply. Damage is uncapped against every target,
+  including bosses. A child mastery node raises it to 25% of current Life.
 
 ### Shadow Strike
 
@@ -533,7 +535,7 @@ stats instead of ranks 1–10.
 
 ### Gather Qi / Charge
 
-- **Unlock:** Energy Shot learned; Spell Caster/Qi Adept starter.
+- **Unlock:** Energy Shot learned; Spell Caster/Cultivator starter.
 - **Qi cost:** No cost is documented.
 - **Target:** Self; consumes the combat turn.
 - **Original effect:** Restore `25×rCharge` Qi, capped by Max Qi. Rank 10 restores
@@ -567,7 +569,7 @@ stats instead of ranks 1–10.
 - The researched roster does not specify its defences, exact basic-attack formula,
   duration, replacement behavior, or what happens when a shadow already exists.
   Those details require runtime or ActionScript verification.
-- **Successor design:** Retained in the Qi–Swiftblade shadow-arts bridge. It does
+- **Successor design:** Retained in the Qi–Windstep shadow-arts bridge. It does
   not require the Shadow Strike evolution, preventing one mastery choice from
   becoming a hidden prerequisite. The summon inherits 100% of the caster's final
   Speed when created; later changes to the caster's Speed do not retroactively
@@ -597,7 +599,7 @@ stats instead of ranks 1–10.
 
 ### Smoke Step
 
-- **Category:** New successor support technique; Swiftblade region.
+- **Category:** New successor support technique; Windstep region.
 - **Qi cost:** Moderate; exact value is a balance constant.
 - **Target:** Self; consumes the combat turn.
 - **Effect:** The next direct single-target enemy hit before the user's next turn
@@ -613,7 +615,7 @@ stats instead of ranks 1–10.
 
 ### Lightfoot Steps / Shadow Blend
 
-- **Unlock:** Level 1 and Speed Strike learned; Shadow Ninja/Swiftblade starter.
+- **Unlock:** Level 1 and Speed Strike learned; Shadow Ninja/Windstep starter.
 - **Original effect:** At battle start, add `2×rShadowBlend` Speed.
 - No separate original critical modifier is documented. Any critical improvement in
   the successor is an indirect consequence of its Speed rules.
@@ -649,9 +651,9 @@ action-bar entries. The first tree uses these 10:
 | Qi            | Deep Meridian     | Placeholder: may improve Max Qi or other recovery without changing Attack's fixed 10-Qi rule.                    |
 | Qi            | Controlled Burn   | Burn lasts longer, but cannot be refreshed beyond its duration cap.                                              |
 | Qi            | Energy Field      | Increases Qi-technique damage and improves Qi Ward; it does not affect Qi Burst's Qi conversion.                 |
-| Swiftblade    | First Blood       | Grants bounded critical chance against targets at full Life.                                                     |
-| Swiftblade    | Relentless Rhythm | Later hits in a multi-hit technique gain a small damage bonus.                                                   |
-| Swiftblade    | Lightfoot Steps   | Increases Speed and bounded critical chance; it has no mid-combat turn-order effect.                             |
+| Windstep    | First Blood       | Grants bounded critical chance against targets at full Life.                                                     |
+| Windstep    | Relentless Rhythm | Later hits in a multi-hit technique gain a small damage bonus.                                                   |
+| Windstep    | Lightfoot Steps   | Increases Speed and bounded critical chance; it has no mid-combat turn-order effect.                             |
 | Center/hybrid | Flowing Steel     | A limited portion of the lower of Physical Damage and Qi Damage contributes to techniques using the higher stat. |
 
 Inner Strength, Energy Field, and Lightfoot Steps therefore no longer exist as

@@ -55,6 +55,7 @@ function modifierText(field: string, amount: number) {
           ? 'use'
           : 'uses'
         : field;
+  if (field === 'percent') return `${signed(amount)}% Life scaling`;
   return `${signed(amount)} ${label}`;
 }
 

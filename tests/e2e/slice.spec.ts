@@ -62,6 +62,10 @@ test('keyboard class choice, connected gateway and saved world', async ({
   await page
     .getByRole('button', { name: 'Choose Warrior', exact: true })
     .press('Enter');
+  // Class selection hides the canvas during startup; it must regain its size.
+  await expect
+    .poll(async () => (await page.locator('canvas').boundingBox())?.width ?? 0)
+    .toBeGreaterThan(100);
   await expect(
     page.getByRole('button', { name: 'down · Beyond the Temple', exact: true }),
   ).toBeDisabled();
@@ -337,8 +341,8 @@ test('standalone class portraits, hover/focus tooltips and Wanderer compatibilit
   await expect(page.locator('.class-column')).toHaveCount(4);
   await expect(page.locator('.class-column h2')).toHaveText([
     'Warrior',
-    'Qi Adept',
-    'Swiftblade',
+    'Cultivator',
+    'Windstep',
     'Wanderer',
   ]);
   await expect(page.locator('.class-columns')).not.toContainText('Mana');
@@ -367,7 +371,7 @@ test('standalone class portraits, hover/focus tooltips and Wanderer compatibilit
     fullPage: true,
   });
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByLabel('Qi Adept class preview', { exact: true }).tap();
+  await page.getByLabel('Cultivator class preview', { exact: true }).tap();
   await expect(page.locator('#class-tip-caster')).toHaveCSS('opacity', '1');
   expect(
     await page.evaluate(

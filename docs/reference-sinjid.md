@@ -23,8 +23,8 @@ them as compatibility requirements.
 | ---------- | ----------------------------------------------------------------------------------------------- | -------------- | --------------- |
 | Wanderer   | Generalist with no outstanding weakness                                                         | Flying Blades  | Iron Knife      |
 | Warrior    | Strength- and Life-focused melee fighter; slower and weak in qi                                 | Stab           | Iron Knife      |
-| Qi Adept   | Qi-focused class with high Qi; relies on projected techniques, healing, Gather Qi, and Qi Burst | Gather Qi      | Energy Knife    |
-| Swiftblade | Speed- and evasion-focused class with weaker physical power                                     | Shadow Blend   | Iron Knife      |
+| Cultivator   | Qi-focused class with high Qi; relies on projected techniques, healing, Gather Qi, and Qi Burst | Gather Qi      | Energy Knife    |
+| Windstep | Speed- and evasion-focused class with weaker physical power                                     | Shadow Blend   | Iron Knife      |
 
 Starting stats and class-specific level-up boosts:
 
@@ -32,8 +32,8 @@ Starting stats and class-specific level-up boosts:
 | ---------- | -------: | ------: | -------: | -------: | --------------: | --------: | ---------------: | ---------: |
 | Wanderer   |  15 (+2) | 15 (+2) | 75 (+10) | 75 (+10) |           3 (8) |         2 |                3 |          2 |
 | Warrior    |  17 (+3) | 13 (+1) | 85 (+15) |  65 (+5) |          5 (10) |         0 |                5 |          0 |
-| Qi Adept   |  15 (+1) | 13 (+2) | 75 (+10) | 90 (+15) |               0 |    5 (10) |                0 |          5 |
-| Swiftblade |  13 (+1) | 17 (+3) | 70 (+10) | 80 (+10) |           3 (8) |         3 |                2 |          2 |
+| Cultivator   |  15 (+1) | 13 (+2) | 75 (+10) | 90 (+15) |               0 |    5 (10) |                0 |          5 |
+| Windstep |  13 (+1) | 17 (+3) | 70 (+10) | 80 (+10) |           3 (8) |         3 |                2 |          2 |
 
 All classes start with 50 Max Energy. Parenthesized values in stat columns are the
 class-specific increase when that stat is chosen at level-up. Damage values shown as
@@ -116,7 +116,7 @@ rank scaling of Shadow Strike and Annihilate. Do not reproduce them silently.
 
 | Successor name (original) | Unlock and cost                                           | Original detailed effect                                                                                                                                                                                                                     |
 | ------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Gather Qi (Charge)        | Energy Shot learned; no cost documented; Qi Adept starter | Self; consumes the turn; restores `25×rCharge` Qi, capped at Max Qi. Rank 10 restores 250.                                                                                                                                                   |
+| Gather Qi (Charge)        | Energy Shot learned; no cost documented; Cultivator starter | Self; consumes the turn; restores `25×rCharge` Qi, capped at Max Qi. Rank 10 restores 250.                                                                                                                                                   |
 | Heal                      | Level 5 + Charge; 15 Qi                                   | Self; consumes the turn; restores `Max Life×(0.13+0.12×rHeal)`, capped at Max Life. The raw formula exceeds 100% at rank 8.                                                                                                                  |
 | Shadow Replicate          | Level 15 + Shadow Strike; 100 Qi                          | Summons a shadow ally with Max Life `70+30×r`, Physical Damage `13+12×r`, Magical/Qi Damage `13+12×r`, and Speed `Sinjid Speed+4×r`. Defence, duration, repeat-cast, replacement, and exact attack behavior are not specified by the source. |
 
@@ -124,7 +124,7 @@ rank scaling of Shadow Strike and Annihilate. Do not reproduce them silently.
 
 | Successor name (original)      | Unlock                                     | Original detailed effect                                                                                                                                                                                                             |
 | ------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Lightfoot Steps (Shadow Blend) | Level 1 + Speed Strike; Swiftblade starter | At battle start, adds `2×rShadowBlend` Speed. No separate critical bonus is documented.                                                                                                                                              |
+| Lightfoot Steps (Shadow Blend) | Level 1 + Speed Strike; Windstep starter | At battle start, adds `2×rShadowBlend` Speed. No separate critical bonus is documented.                                                                                                                                              |
 | Energy Field                   | Level 1 + Energy Shot                      | Adds `7×rEnergyField` to Shuriken, Energy Shot, Blast Fire, Shadow Strike, and Annihilate formulas. It does not affect Mana Bomb. Because of the channel bug, the documented magical passive ultimately raises physical-type damage. |
 | Inner Strength                 | Level 5 + Vertical Strike                  | Adds `5×rInnerStrength` to Attack, Stab, Double Strike, Speed Strike, Vertical Strike, Avenger, Split, and Execution formulas. Because of the channel bug, the documented physical passive ultimately raises qi/magical-type damage. |
 

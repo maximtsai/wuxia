@@ -48,7 +48,7 @@ its usual prerequisites. This rank system is temporary compatibility content. Ne
 sessions and migrated saves also carry an empty shared-tree allocation anchored to
 their chosen origin. Tree node effects (see Content editor) apply to derived stats
 and skills once allocated. Most shipped nodes are effect-free placeholders. The
-exceptions are the Avenger technique node and its third-use mastery.
+exceptions are the Avenger and Cut Down technique nodes and their child masteries.
 
 Each level requires 50 × current level EXP, grants one stat choice and one Skill
 Point, and adds 5 maximum Life, 5 Qi, and 3 Energy. Every fifth level adds 2
@@ -77,6 +77,15 @@ state, and empty resets cannot charge gold.
   Life. It replaces normal Strength, weapon, and rank scaling; defense and critical
   hits still apply. It is unavailable at full Life. The `technique-avenger` tree
   node grants it, and its child `avenger-third-use` adds a third use.
+- A skill's `percent` field sets Life-based damage that replaces normal scaling.
+  Avenger deals `percent` (250) of the player's missing Life. `enemyLife` skills deal
+  `percent` of the target's current Life at the moment of the hit. Tree
+  `skillModifier` effects with `field: "percent"` raise it, and `noCrit` skills never
+  critically strike.
+- Cut Down (internal id `split`) costs 30 Qi and hits once for 20% of the target's
+  current Life. It cannot crit; defense and shields still apply. The
+  `technique-cut-down` node grants it, and its child `cut-down-deeper` raises the
+  damage to 25%.
 - Actions preview effect/cost/target and require confirmation. Tokens reject stale
   commands. Previewed base power and resolved base power use the same pure
   calculation. Multi-hit/all-target actions pay Qi once; invalid targets spend
@@ -166,7 +175,7 @@ focus portraits before choosing. Phones use two rows for legibility. World art
 remains independent. Balanced is now displayed as Wanderer; its stable save ID
 `balanced`, stats, and growth remain unchanged. Legacy saves need no migration.
 
-Wuxia theme: Warrior (red), Qi Adept (icy blue-white), Swiftblade (yellow),
+Wuxia theme: Warrior (red), Cultivator (icy blue-white), Windstep (yellow),
 and Wanderer (jade), displayed in that order. Portraits use rough, bold brushwork
 and distinct action poses with averted gazes. UI terminology uses Qi; internal
 resource/class keys remain stable for save compatibility.
@@ -213,13 +222,13 @@ that is not part of the production build.
 
 Effect types:
 
-| Type            | Fields                                            | Applied in                                        |
-| --------------- | ------------------------------------------------- | ------------------------------------------------- |
-| `stat`          | `stat`, `amount` (flat)                           | `syncStats`, action power, player defense         |
-| `statPercent`   | `stat`, `percent` (after flat bonuses)            | same as `stat`                                    |
-| `grantSkill`    | `skill`, `rank` (1–10)                            | `skillRank`: usable if not learned; highest wins  |
-| `skillModifier` | `skill`, `field` (cost/power/hits/uses), `amount` | `effectiveSkill`, used by previews and resolution |
-| `flag`          | `flag`                                            | `hasTreeFlag` for rules implemented in code       |
+| Type            | Fields                                                    | Applied in                                        |
+| --------------- | --------------------------------------------------------- | ------------------------------------------------- |
+| `stat`          | `stat`, `amount` (flat)                                   | `syncStats`, action power, player defense         |
+| `statPercent`   | `stat`, `percent` (after flat bonuses)                    | same as `stat`                                    |
+| `grantSkill`    | `skill`, `rank` (1–10)                                    | `skillRank`: usable if not learned; highest wins  |
+| `skillModifier` | `skill`, `field` (cost/power/hits/uses/percent), `amount` | `effectiveSkill`, used by previews and resolution |
+| `flag`          | `flag`                                                    | `hasTreeFlag` for rules implemented in code       |
 
 Stats: `strength`, `speed`, `maxLife`, `maxMana`, `maxEnergy`, `defense`,
 `qiDefense`, `physicalPower`, `qiPower`. Granted ranks do not satisfy

@@ -18,6 +18,7 @@ export const skillEffects = [
   'heal',
   'charge',
   'summon',
+  'enemyLife',
 ] as const;
 
 export interface Skill {
@@ -34,6 +35,10 @@ export interface Skill {
   description: string;
   /** Uses per encounter; omitted means unlimited. */
   uses?: number;
+  /** Life percentage for `avenger` (missing Life) and `enemyLife` (target's current Life) damage. */
+  percent?: number;
+  /** When true, the skill never critically strikes. */
+  noCrit?: boolean;
 }
 
 export const treeNodeKinds = [
@@ -71,7 +76,13 @@ export const treeStatLabels: Record<TreeStat, string> = {
   qiPower: 'Qi power',
 };
 
-export const skillModifierFields = ['cost', 'power', 'hits', 'uses'] as const;
+export const skillModifierFields = [
+  'cost',
+  'power',
+  'hits',
+  'uses',
+  'percent',
+] as const;
 export type SkillModifierField = (typeof skillModifierFields)[number];
 
 export type TreeEffect =
@@ -370,6 +381,18 @@ export function validateSkillData(
       (!Number.isInteger(raw.uses) || (raw.uses as number) < 1)
     )
       issue('uses must be a whole number of at least 1');
+    if (
+      raw.percent !== undefined &&
+      (!isFiniteNumber(raw.percent) || raw.percent < 0)
+    )
+      issue('percent must be a number of at least 0');
+    if (
+      (raw.effect === 'avenger' || raw.effect === 'enemyLife') &&
+      raw.percent === undefined
+    )
+      issue(`${raw.effect} skills need a percent`);
+    if (raw.noCrit !== undefined && typeof raw.noCrit !== 'boolean')
+      issue('noCrit must be true or false');
     if (
       !Array.isArray(raw.requires) ||
       raw.requires.some((r) => !includes(ids, r))

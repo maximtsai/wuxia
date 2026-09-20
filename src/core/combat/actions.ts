@@ -26,6 +26,7 @@ export function calculateActionPower(
   id: CombatAction,
   rank: number,
   manaBeforeCost: number,
+  target?: { life: number },
 ) {
   if (skill.kind === 'support' || skill.kind === 'passive') return 0;
   const characterClass = classes[player.classId ?? 'balanced'],
@@ -44,8 +45,11 @@ export function calculateActionPower(
         applyTreeStat(tree, 'physicalPower', 0));
   if (id === 'speedStrike')
     power += effectiveSpeed(player) - player.strength * 0.6;
-  // Avenger replaces normal scaling: 250% of the player's missing Life.
-  if (skill.effect === 'avenger') power = (player.maxLife - player.life) * 2.5;
+  // Percentage effects replace normal scaling; `percent` comes from skill data and tree modifiers.
+  const percent = (skill.percent ?? 0) / 100;
+  if (skill.effect === 'avenger')
+    power = (player.maxLife - player.life) * percent;
+  if (skill.effect === 'enemyLife') power = (target?.life ?? 0) * percent;
   if (skill.effect === 'manaBomb')
     power = manaBeforeCost * (0.55 + 0.08 * rank);
   return power;

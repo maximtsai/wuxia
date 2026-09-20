@@ -32,7 +32,7 @@
     },
     {
       "id": "inner-swiftblade",
-      "name": "Swiftblade approach",
+      "name": "Windstep approach",
       "kind": "passive",
       "region": "swiftblade",
       "position": { "x": 1, "y": 1 },
@@ -57,7 +57,7 @@
     },
     {
       "id": "origin-qi",
-      "name": "Qi Adept origin",
+      "name": "Cultivator origin",
       "kind": "origin",
       "region": "qi",
       "position": { "x": 0, "y": -2 },
@@ -72,7 +72,7 @@
     },
     {
       "id": "origin-swiftblade",
-      "name": "Swiftblade origin",
+      "name": "Windstep origin",
       "kind": "origin",
       "region": "swiftblade",
       "position": { "x": 2, "y": 2 },
@@ -94,7 +94,8 @@
       "connections": [
         "origin-warrior",
         "capstone-warrior",
-        "technique-avenger"
+        "technique-avenger",
+        "technique-cut-down"
       ],
       "placeholder": true,
       "effects": []
@@ -111,7 +112,7 @@
     },
     {
       "id": "outer-swiftblade",
-      "name": "Advanced Swiftblade path",
+      "name": "Advanced Windstep path",
       "kind": "passive",
       "region": "swiftblade",
       "position": { "x": 3, "y": 3 },
@@ -141,7 +142,7 @@
     },
     {
       "id": "capstone-swiftblade",
-      "name": "Swiftblade capstone placeholder",
+      "name": "Windstep capstone placeholder",
       "kind": "vow",
       "region": "swiftblade",
       "position": { "x": 4, "y": 4 },
@@ -203,6 +204,33 @@
           "skill": "avenger",
           "field": "uses",
           "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "technique-cut-down",
+      "name": "Cut Down",
+      "description": "Unlocks Cut Down: strike one enemy for 20% of its current Life.",
+      "kind": "technique",
+      "region": "warrior",
+      "position": { "x": -2, "y": 4 },
+      "connections": ["outer-warrior", "cut-down-deeper"],
+      "effects": [{ "type": "grantSkill", "skill": "split", "rank": 1 }]
+    },
+    {
+      "id": "cut-down-deeper",
+      "name": "Cut Down: Deeper Cut",
+      "description": "Cut Down deals 25% of the target's current Life instead of 20%.",
+      "kind": "mastery",
+      "region": "warrior",
+      "position": { "x": -1.5, "y": 5 },
+      "connections": ["technique-cut-down"],
+      "effects": [
+        {
+          "type": "skillModifier",
+          "skill": "split",
+          "field": "percent",
+          "amount": 5
         }
       ]
     }

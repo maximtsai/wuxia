@@ -18,8 +18,8 @@ shared-tree scaffold, save v5 tree persistence, and independent preferences.
     versioned save migration that drops stored stat choices and recomputes stats
     without losing level, EXP, or other progression.
   - Lay out the tree with pure stat nodes between abilities, drawback-free fundamental
-    center nodes (Qi recovery toward Qi Adept, Life recovery toward Warrior, Quick
-    Draught toward Swiftblade), and extreme outer nodes with drawbacks. Quick Draught
+    center nodes (Qi recovery toward Cultivator, Life recovery toward Warrior, Quick
+    Draught toward Windstep), and extreme outer nodes with drawbacks. Quick Draught
     needs a once-per-encounter turn-keeping potion drink in combat commands, retries,
     potion UI, and logs.
   - Support per-encounter limited-use techniques in content, commands, retries, UI, and

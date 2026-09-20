@@ -107,13 +107,14 @@ Retain internal IDs `balanced`, `warrior`, `caster`, `shadow`, `mana`, `maxMana`
 | Internal / original     | Display name    |
 | ----------------------- | --------------- |
 | Balanced / Talentless   | Wanderer        |
-| Spell Caster (`caster`) | Qi Adept        |
-| Shadow Ninja (`shadow`) | Swiftblade      |
+| Spell Caster (`caster`) | Cultivator        |
+| Shadow Ninja (`shadow`) | Windstep      |
 | Shuriken                | Flying Blades   |
 | Charge                  | Gather Qi       |
 | Energy Shot             | Qi Strike       |
 | Mana Bomb               | Qi Burst        |
 | Shadow Blend            | Lightfoot Steps |
+| Split                   | Cut Down        |
 
 Original names may remain in research citations and internal keys only. The full
 naming map is in [abilities.md](abilities.md).
@@ -186,8 +187,8 @@ approved. Classes appear left to right in this order:
 | Class      | Direction                                          | Accent            | Portrait action                                    |
 | ---------- | -------------------------------------------------- | ----------------- | -------------------------------------------------- |
 | Warrior    | Strength, resilience, decisive dao strikes         | Vermilion red     | Grounded diagonal sword lunge, side profile        |
-| Qi Adept   | Inner cultivation and projected qi                 | Icy blue-white    | Turning palm strike, eyes following the projection |
-| Swiftblade | Lightness skill, opening speed, critical precision | Golden yellow     | Airborne sideways leap, looking toward the landing |
+| Cultivator   | Inner cultivation and projected qi                 | Icy blue-white    | Turning palm strike, eyes following the projection |
+| Windstep | Lightness skill, opening speed, critical precision | Golden yellow     | Airborne sideways leap, looking toward the landing |
 | Wanderer   | Generalist, self-taught and adaptable              | Jade / sage green | Low sweeping staff stance, face under a straw hat  |
 
 Wanderer flavor: “You were born with no specialty, but your potential is yours to
@@ -234,7 +235,7 @@ The full specification is in [abilities.md](abilities.md). Structural rules:
 **Topology**
 
 - One visible, connected tree for all classes. Wanderer's origin is the center.
-  Warrior, Qi Adept, and Swiftblade origins sit roughly midway between the center and
+  Warrior, Cultivator, and Windstep origins sit roughly midway between the center and
   the outer edge of their themed region.
 - All links are bidirectional, and every node is reachable from every origin. Cycles
   and alternate routes are allowed; there are no class-exclusive or one-way links.
@@ -257,9 +258,9 @@ The full specification is in [abilities.md](abilities.md). Structural rules:
   tax.
 - **Center nodes are fundamental.** Nodes near the Wanderer origin are broadly useful
   and drawback-free. They include:
-  - a **Qi recovery** node near the center, in the direction of the Qi Adept;
+  - a **Qi recovery** node near the center, in the direction of the Cultivator;
   - a **Life recovery** node near the center, in the direction of the Warrior;
-  - a **Quick Draught** node near the center, in the direction of the Swiftblade.
+  - a **Quick Draught** node near the center, in the direction of the Windstep.
 - **Edge nodes are extreme.** Moving outward, nodes become more specialized and more
   powerful, and outer nodes pair their benefit with a real **drawback**. An edge node
   must not be strictly better than a center node; it is a stronger commitment.
@@ -862,6 +863,9 @@ Acceptance records for completed phases are in [docs/history.md](docs/history.md
 - Limited-use techniques (§4.4), first applied to Avenger: 0 Qi, 2 uses, and base
   power equal to 250% of missing Life. The `technique-avenger` node grants it, and its
   child mastery adds a third use.
+- Split is renamed **Cut Down**: 30 Qi and one hit for 20% of the target's current
+  Life, and it cannot crit. The `technique-cut-down` node grants it, and its child
+  mastery raises the damage to 25%.
 - Saves record a content hash. Saves made against earlier content refund invalid
   nodes and ranks instead of failing to load.
 
@@ -877,8 +881,8 @@ free starter rank, so the first tree point arrives at level 2 rather than at cre
 - Identical per-level growth for all classes, removal of the per-level stat choice,
   and narrower starting-stat differences.
 - Tree node gradient: stat nodes between abilities, fundamental center nodes (Qi
-  recovery toward Qi Adept, Life recovery toward Warrior, Quick Draught toward
-  Swiftblade), extreme edge nodes with drawbacks.
+  recovery toward Cultivator, Life recovery toward Warrior, Quick Draught toward
+  Windstep), extreme edge nodes with drawbacks.
 - Tree text search and filters (§3.3).
 - Limited-use counts for techniques beyond Avenger, and showing uses in the action
   preview.

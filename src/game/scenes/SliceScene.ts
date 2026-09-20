@@ -1,4 +1,6 @@
 import { classSelection } from '../classSelection';
+import { CharacterStage } from '../characters/CharacterStage';
+
 import {
   rooms,
   doorways,
@@ -100,10 +102,14 @@ export class SliceScene extends Phaser.Scene {
   private chosen: CombatAction = 'attack';
   private respecOpen = false;
   private treeSelected: string | null = null;
+  private characters!: CharacterStage;
   constructor() {
     super('Slice');
   }
+
   create() {
+    this.characters = new CharacterStage(this);
+    this.events.once('shutdown', () => this.characters.destroy());
     this.panel = document.querySelector<HTMLElement>('#interface')!;
     document.querySelector('h1')!.textContent = theme.title;
     document.title = theme.title;
@@ -364,6 +370,8 @@ export class SliceScene extends Phaser.Scene {
   }
   update(_time: number, delta: number) {
     if (this.paused) return;
+    this.characters.sync(this.session);
+    this.characters.tick(delta);
     if (
       this.session.battle &&
       ['enemy', 'shadow'].includes(this.session.battle.turn)
@@ -462,7 +470,10 @@ export class SliceScene extends Phaser.Scene {
       );
       candidate?.focus({ preventScroll: true });
     }
-    if (wasSelecting && !selecting) this.scale.refresh();
+    if (wasSelecting && !selecting) {
+      this.scale.setGameSize(1600, 900);
+      this.scale.refresh();
+    }
     this.draw();
   }
   private menuMarkup() {
@@ -660,7 +671,6 @@ export class SliceScene extends Phaser.Scene {
     if (s.battle) {
       const b = s.battle;
       label(800, 100, encounters[b.encounterId].name, 38);
-      g.fillStyle(c.player).fillRoundedRect(275, 435, 100, 170, 10);
       label(325, 340, theme.player);
       label(
         325,
@@ -669,18 +679,10 @@ export class SliceScene extends Phaser.Scene {
         24,
       );
       if (b.shadow && b.shadow.life > 0) {
-        g.fillStyle(0x817fba).fillRoundedRect(480, 535, 70, 120, 10);
         label(515, 720, `Shadow ${b.shadow.life} Life`, 22);
       }
       b.enemies.forEach((e, i) => {
         const x = b.enemies.length === 1 ? 1170 : 960 + i * 360;
-        g.fillStyle(e.life ? c.enemy : c.line).fillRoundedRect(
-          x - 45,
-          435,
-          90,
-          170,
-          10,
-        );
         label(x, 340, e.name, 26);
         label(x, 665, `${e.life}/${e.maxLife} Life`, 24);
         label(x, 705, `${e.shield} shield · ${e.mana} Qi`, 22);
@@ -700,7 +702,6 @@ export class SliceScene extends Phaser.Scene {
       g.lineStyle(2, c.line);
       for (let y = 410; y < 790; y += 125) g.lineBetween(90, y, 1510, y);
       for (const x of [400, 800, 1200]) g.lineBetween(x, 290, x, 790);
-      g.fillStyle(c.enemy).fillRoundedRect(760, 390, 80, 100, 10);
       label(
         800,
         370,
@@ -718,8 +719,6 @@ export class SliceScene extends Phaser.Scene {
           g.fillStyle(c.floor).fillRect(x - 45, y, 90, 130);
         g.lineStyle(4, c.player).strokeRect(x - 45, y - 35, 90, 70);
       }
-      g.lineStyle(2, c.player).strokeCircle(s.position.x, s.position.y, 44);
-      g.fillStyle(c.player).fillCircle(s.position.x, s.position.y, 32);
       label(s.position.x, s.position.y + 65, theme.player, 26);
     }
   }

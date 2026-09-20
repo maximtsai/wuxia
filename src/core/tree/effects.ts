@@ -60,6 +60,7 @@ export function treeModifiers(
             power: 0,
             hits: 0,
             uses: 0,
+            percent: 0,
           };
           mods.skillModifiers[effect.skill][effect.field] += effect.amount;
           break;

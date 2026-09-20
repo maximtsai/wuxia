@@ -31,7 +31,7 @@ export const classes = {
     starter: 'stab',
   },
   caster: {
-    name: 'Qi Adept',
+    name: 'Cultivator',
     strength: 15,
     speed: 13,
     life: 75,
@@ -44,7 +44,7 @@ export const classes = {
     starter: 'charge',
   },
   shadow: {
-    name: 'Swiftblade',
+    name: 'Windstep',
     strength: 13,
     speed: 17,
     life: 70,

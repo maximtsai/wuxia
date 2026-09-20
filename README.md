@@ -48,7 +48,7 @@ respecs. Weapon shops occupy the merchant, advanced, and Rift rooms. Take mercha
 parcels to the Library for 35 gold each. Save v5 includes room, campaign, delivery,
 and empty shared-tree progress; v1–v4 migrate while preserving the character.
 
-Wuxia theme: Warrior (red), Qi Adept (icy blue-white), Swiftblade (yellow),
+Wuxia theme: Warrior (red), Cultivator (icy blue-white), Windstep (yellow),
 and Wanderer (jade), displayed in that order. Portraits use rough, bold brushwork
 and distinct action poses with averted gazes. UI terminology uses Qi; internal
 resource/class keys remain stable for save compatibility.

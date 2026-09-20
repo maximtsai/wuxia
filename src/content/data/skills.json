@@ -109,21 +109,24 @@
     "hits": 1,
     "power": 0,
     "effect": "avenger",
-    "description": "Deal 250% of your missing Life to one enemy. Costs no Qi; 2 uses per encounter.",
-    "uses": 2
+    "description": "Strike one enemy based on your missing Life. Costs no Qi.",
+    "uses": 2,
+    "percent": 250
   },
   "split": {
-    "name": "Split",
+    "name": "Cut Down",
     "icon": "10",
-    "cost": 25,
+    "cost": 30,
     "level": 10,
     "requires": ["innerStrength"],
     "kind": "physical",
     "target": "single",
-    "hits": 2,
-    "power": 14,
-    "effect": "shield",
-    "description": "Two shield-breaking strikes against one enemy."
+    "hits": 1,
+    "power": 0,
+    "effect": "enemyLife",
+    "description": "Strike one enemy for a share of its current Life.",
+    "percent": 20,
+    "noCrit": true
   },
   "shadowStrike": {
     "name": "Shadow Strike",

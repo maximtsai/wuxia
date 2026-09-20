@@ -283,6 +283,8 @@ export function mountPanels(
           ${field('Hits', num('hits'))}
           ${field('Power', num('power'))}
           ${field('Uses per fight', `<input ${data('uses')} type="number" min="1" step="1" value="${skill.uses ?? ''}" placeholder="unlimited">`)}
+          ${field('Life percent', `<input ${data('percent')} type="number" min="0" step="1" value="${skill.percent ?? ''}" placeholder="none">`)}
+          ${field('Cannot crit', `<input ${data('noCrit')} type="checkbox"${skill.noCrit ? ' checked' : ''}>`)}
         </div>
         ${field('Description', `<textarea ${data('description')} rows="2">${esc(skill.description)}</textarea>`, true)}
         <h3>Requires</h3>
@@ -510,7 +512,16 @@ export function mountPanels(
         report(
           editor.commit(() => {
             const target = skill as unknown as Record<string, unknown>;
-            if (skillField === 'uses') {
+            if (skillField === 'noCrit') {
+              if ((control as HTMLInputElement).checked) skill.noCrit = true;
+              else delete skill.noCrit;
+            } else if (skillField === 'percent') {
+              const n = parseNumber(control);
+              if (!control.value.trim()) delete skill.percent;
+              else if (n === null || n < 0)
+                return 'Life percent must be a number of at least 0';
+              else skill.percent = n;
+            } else if (skillField === 'uses') {
               const n = parseNumber(control);
               if (!control.value.trim()) delete skill.uses;
               else if (n === null || !Number.isInteger(n) || n < 1)

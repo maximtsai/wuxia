@@ -74,6 +74,10 @@ export function effectiveSkill(
       base.uses === undefined
         ? undefined
         : Math.max(1, Math.round(base.uses + mod.uses)),
+    percent:
+      base.percent === undefined
+        ? undefined
+        : Math.max(0, base.percent + mod.percent),
   };
 }
 export function effectiveSpeed(p: Player) {
