@@ -177,9 +177,15 @@ coordinates. No SDK, autosave, or external assets were added.
 
 A separate opening screen precedes the overworld. Four generated portraits in
 `public/images/classes/` retain subdued color at rest and full color when selected.
-Whole-card buttons preview a class without committing; one Begin journey button
-confirms the choice. A short description and expandable starting details replace
-hover tooltips. Keyboard and touch use the same flow; phones use two rows. World art
+Whole-card buttons preview a class without committing. The selected card lists
+its strengths and weaknesses against Wanderer's even stats (computed from class
+data) and its starting technique; a one-line description sits between the cards
+and a centred Begin journey button. Choosing a card updates the screen in place
+(`previewClassInPlace`) so CSS can animate it: the name and tagline glide up as
+the traits row opens, traits pop in staggered and shrink out together, the check
+mark pops, the description fades in, and Begin journey glows once when it first
+becomes available. Cards rise in one after another on first arrival. Reduced
+motion turns all of this off. Keyboard and touch use the same flow; phones use two rows. World art
 remains independent. Balanced is now displayed as Wanderer; its stable save ID
 `balanced`, stats, and growth remain unchanged. Legacy saves need no migration.
 

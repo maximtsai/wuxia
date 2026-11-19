@@ -1302,52 +1302,51 @@ button.class-column {
 .class-column[aria-pressed='true'] .class-check {
   opacity: 1;
 }
+/* Description, then the one decision, centred under the cards. */
 .class-decision {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 28px;
-  margin-top: 26px;
-  min-height: 94px;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  text-align: center;
 }
-.class-summary {
+.class-decision p {
+  margin: 0;
   max-width: 620px;
-  font-size: 14px;
+  min-height: 1.6em;
+  font-size: 15px;
   line-height: 1.6;
 }
-.class-summary > p {
-  margin: 0 0 8px;
-}
-.class-details {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-.class-details summary {
-  cursor: pointer;
-  color: var(--class-accent);
-  width: fit-content;
-}
-.class-details p {
-  margin: 8px 0;
-}
 .class-begin {
-  flex-shrink: 0;
-  min-width: 185px;
+  min-width: 220px;
   background: linear-gradient(var(--primary-top), var(--primary-bottom));
   border-color: var(--primary-edge);
-  padding: 15px 20px;
+  padding: 15px 28px;
   font-weight: 700;
-}
-.class-begin span {
-  margin-left: 20px;
 }
 .class-begin:disabled {
   background: transparent;
 }
-.class-permanent {
-  font-size: 11px;
-  color: var(--text-faint);
-  margin: 10px 0 0;
+/* The selected card lists its strengths, weaknesses and starting technique. */
+.class-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.trait.up {
+  color: #a6e3ad;
+}
+.trait.down {
+  color: #f1a493;
+}
+.trait-start {
+  flex-basis: 100%;
+  font-weight: 400;
+  color: var(--text);
 }
 @media (max-width: 600px) {
   .class-heading {
@@ -1370,12 +1369,12 @@ button.class-column {
   .class-tagline {
     font-size: 11px;
   }
-  .class-decision {
-    flex-direction: column;
-    gap: 16px;
-  }
   .class-begin {
     width: 100%;
+  }
+  .class-traits {
+    font-size: 11px;
+    gap: 0 6px;
   }
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -2138,4 +2137,152 @@ kbd {
 .temple-map .map-room small {
   font-size: 0.8em;
   color: var(--text-muted);
+}
+
+/* ---- Class selection motion ------------------------------------------- */
+/* The caption sits at the bottom of the card; the traits row grows from zero
+   height, so the name and tagline glide up as it opens and back down as it
+   closes. */
+.class-caption {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.class-traits-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.class-traits-wrap > .class-traits {
+  overflow: hidden;
+  min-height: 0;
+  padding-top: 0;
+  transition: padding-top 0.35s;
+}
+.class-column[aria-pressed='true'] .class-traits-wrap {
+  grid-template-rows: 1fr;
+}
+.class-column[aria-pressed='true'] .class-traits {
+  padding-top: 6px;
+}
+/* Each trait pops in with a little overshoot, staggered; they shrink out
+   together, quickly, when another card is chosen. */
+.class-traits .trait {
+  display: inline-block;
+  opacity: 0;
+  transform: scale(0.4);
+  transform-origin: left center;
+  transition:
+    opacity 0.12s ease-in,
+    transform 0.12s ease-in;
+}
+.class-column[aria-pressed='true'] .class-traits .trait {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.2s ease-out calc(0.12s + var(--i, 0) * 0.05s),
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)
+      calc(0.12s + var(--i, 0) * 0.05s);
+}
+.class-traits .trait-start {
+  flex-basis: 100%;
+}
+/* The name takes the class colour as it lifts. */
+.class-name {
+  transition:
+    color 0.3s,
+    text-shadow 0.3s;
+}
+.class-column[aria-pressed='true'] .class-name {
+  color: var(--class-accent);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--class-accent) 45%, transparent);
+}
+/* Card: smooth lift, a little press, and a slow zoom on the artwork. */
+.class-column {
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s,
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.class-column:active {
+  transform: translateY(-2px) scale(0.98);
+}
+.class-column > img {
+  transition:
+    filter 0.4s,
+    transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.class-column[aria-pressed='true'] > img {
+  transform: scale(1.04);
+}
+/* Check mark pops with overshoot. */
+.class-check {
+  transform: scale(0);
+  transition:
+    opacity 0.15s,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.class-column[aria-pressed='true'] .class-check {
+  transform: scale(1);
+}
+/* Description eases in whenever it changes. */
+.desc-in {
+  animation: desc-in 0.35s ease-out;
+}
+@keyframes desc-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+/* Begin journey glows once when it first becomes available. */
+.class-begin.ready {
+  animation: begin-ready 0.9s ease-out;
+}
+@keyframes begin-ready {
+  0% {
+    transform: scale(0.96);
+    box-shadow: 0 0 0 0 #e3bf6c99;
+  }
+  40% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: none;
+    box-shadow: 0 0 0 18px #e3bf6c00;
+  }
+}
+/* First arrival: heading fades in and the cards rise one after another. */
+.class-screen.entering .class-heading {
+  animation: desc-in 0.5s ease-out both;
+}
+.class-screen.entering .class-column {
+  animation: card-rise 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(0.08s + var(--n, 0) * 0.07s);
+}
+.class-screen.entering .class-decision {
+  animation: desc-in 0.5s ease-out 0.45s both;
+}
+@keyframes card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .class-column,
+  .class-column > img,
+  .class-caption,
+  .class-traits-wrap,
+  .class-traits .trait,
+  .class-check {
+    transition: none !important;
+  }
+  .class-column[aria-pressed='true'] > img,
+  .class-column:active {
+    transform: none;
+  }
+  .desc-in,
+  .class-begin.ready,
+  .class-screen.entering * {
+    animation: none !important;
+  }
 }
