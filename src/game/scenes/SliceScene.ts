@@ -1,7 +1,7 @@
 import { bottleDock } from '../bottleDock';
 import { icon } from '../icons';
 import { loadPreferences, savePreferences } from '../../platform/preferences';
-import { classSelection } from '../classSelection';
+import { classSelection, previewClassInPlace } from '../classSelection';
 import { CharacterStage } from '../characters/CharacterStage';
 
 import {
@@ -559,7 +559,7 @@ export class SliceScene extends Phaser.Scene {
       value in classes
     ) {
       this.previewClass = value as ClassId;
-      this.render();
+      if (!previewClassInPlace(this.panel, this.previewClass)) this.render();
       this.panel
         .querySelector<HTMLButtonElement>(
           `[data-command="preview-class"][data-value="${value}"]`,
@@ -620,16 +620,16 @@ export class SliceScene extends Phaser.Scene {
         if (done) this.characters.gesture('salute');
         this.notice = done
           ? s.world.delivery
-            ? 'Parcel accepted. Deliver it to the Library for 35 gold.'
-            : 'Delivery complete. Earned 35 gold.'
-          : 'No delivery available here.';
+            ? 'Parcel taken. The Library pays 35 gold for it.'
+            : 'Parcel delivered. +35 gold.'
+          : 'Nothing to deliver here.';
       }
       if (command === 'buy-weapon') {
         const bought = buyWeapon(s, value as WeaponId);
         if (bought) this.characters.gesture('purchase');
         this.notice = bought
-          ? 'Equipment purchased. Equip it from Equipment.'
-          : 'Cannot purchase this equipment.';
+          ? 'Bought. Equip it from the menu.'
+          : 'You can’t buy that.';
       }
       if (command === 'rest' && rest(s)) {
         this.characters.gesture('rest');
@@ -697,7 +697,7 @@ export class SliceScene extends Phaser.Scene {
         const bought = buyPotion(s, value as PotionId);
         if (bought) this.characters.gesture('purchase');
         this.notice = bought
-          ? 'Reusable bottle purchased. Choose its slot.'
+          ? 'Bottle bought. Pick a slot for it.'
           : 'Cannot buy this potion.';
       }
       if (command === 'slot') {
@@ -844,6 +844,7 @@ export class SliceScene extends Phaser.Scene {
         this.notice,
         this.previewClass,
         hasSave(),
+        !wasSelecting,
       );
     else if (!b) this.renderOverworld();
     else {
@@ -1052,9 +1053,13 @@ export class SliceScene extends Phaser.Scene {
           ([id, d]) =>
             `<p>${d.name}: ${w.cleared[id as PortalId]}/${d.count}</p>`,
         )
-        .join(
-          '',
-        )}<p>${w.cleared.human === 20 ? 'Main objective complete. Return to Entry and take the downward exit.' : 'Next objective: Human Gateway stage ' + (w.cleared.human + 1)}</p><p>${w.delivery ? 'Delivery: take the parcel to the Library.' : 'No active delivery.'} Completed deliveries: ${w.deliveries}</p><p>${w.endingSeen ? 'Ending reached. Optional portals remain available.' : 'Ending not yet visited.'}</p>${this.button('Close journal', 'journal')}`;
+        .join('')}<p>${
+        w.cleared.human === 20
+          ? 'The seals are broken. The way out is below the Entry.'
+          : w.cleared.human === 0
+            ? 'Twenty seals bar the way out. Begin at the Human Gateway.'
+            : `${w.cleared.human} seal${w.cleared.human === 1 ? '' : 's'} broken. ${20 - w.cleared.human} remain${20 - w.cleared.human === 1 ? 's' : ''}.`
+      }</p>${w.delivery ? '<p>You are carrying a parcel for the Library.</p>' : ''}${w.deliveries ? `<p>Parcels delivered: ${w.deliveries}</p>` : ''}${w.endingSeen ? '<p>The Monster Portal and the Rift still stand.</p>' : ''}${this.button('Close journal', 'journal')}`;
     if (this.menu === 'map') {
       const here = w.room,
         exits = Object.values(rooms[here].exits) as RoomId[],
@@ -1091,7 +1096,7 @@ export class SliceScene extends Phaser.Scene {
         .join('')}</div>${this.button('Close map', 'map')}`;
     }
     if (this.menu === 'equipment')
-      return `<h2>Equipment</h2><p>Strength ${p.strength} · Equipped ${theme.weapons[p.weapon]}</p><div class="controls">${p.inventory.map((id) => this.button(`${theme.weapons[id]} · +${weapons[id].damage} damage${id === p.weapon ? ' · Equipped' : ''}`, 'equip', id, id === p.weapon)).join('')}${this.button(p.shieldEquipped ? 'Unequip buckler' : 'Equip buckler', 'shield', '', p.strength < 15)}</div><p>Buckler requires 15 Strength; starts each battle with ${20 + p.level * 3} shield. Physical and qi defenses come from your class.</p>${this.button('Close equipment', 'equipment')}`;
+      return `<h2>Equipment</h2><p>Strength ${p.strength} · Equipped ${theme.weapons[p.weapon]}</p><div class="controls">${p.inventory.map((id) => this.button(`${theme.weapons[id]} · +${weapons[id].damage} damage${id === p.weapon ? ' · Equipped' : ''}`, 'equip', id, id === p.weapon)).join('')}${this.button(p.shieldEquipped ? 'Unequip buckler' : 'Equip buckler', 'shield', '', p.strength < 15)}</div><p>Buckler: ${20 + p.level * 3} shield at the start of each fight. Needs 15 Strength.</p>${this.button('Close equipment', 'equipment')}`;
     if (this.menu === 'skills') return treeScreen(p, this.treeSelected);
     if (this.menu === 'ranks')
       return `<h2>Technique ranks</h2><p>${freeSkillPoints(p)} Skill Points, shared with the skill tree · Class starter is free; maximum rank 10.</p>${this.button('Back to skill tree', 'skills')}${[
@@ -1177,7 +1182,7 @@ export class SliceScene extends Phaser.Scene {
           return `<div class="potion-offer food-offer"><strong>${f.name} · ${f.price} gold</strong><p>+${f.energy} Energy · +${f.life} Life · +${f.mana} Qi</p>${this.button('Eat ' + f.name, 'eat', id, !!why)}<small>${why ?? ''}</small></div>`;
         })
         .join('')}${this.button('Close food seller', 'food')}`;
-    return `<h2>Potion seller</h2><p>Two slots. One owned bottle per type. The well refills all bottles free.</p><p>${[
+    return `<h2>Potion seller</h2><p>You can carry two bottles. Refill them at the well.</p><p>${[
       0, 1,
     ]
       .map((i) => {
@@ -1201,15 +1206,15 @@ export class SliceScene extends Phaser.Scene {
     const w = this.session.world,
       room = rooms[w.room];
     const actionLabels: Record<string, string> = {
-      rest: w.room === 'potions' ? 'Meal · recover free' : 'Recover · free',
+      rest: w.room === 'potions' ? 'Eat · free' : 'Recover · free',
       dialogue: 'Talk',
       shop: 'Browse potions',
       food: 'Browse food',
       refill: 'Refill bottles · free',
       encounters: w.room === 'training' ? 'Train' : 'Enter trials',
       vendor: 'Browse equipment',
-      library: 'Read / Deliver',
-      progression: 'Respec with Mentor',
+      library: 'Visit the archives',
+      progression: 'Rethink your training',
       save: 'Save progress',
       meditate: `Full restore · ${MONK_RESTORES - w.restoresUsed}/${MONK_RESTORES} left`,
       delivery: w.delivery

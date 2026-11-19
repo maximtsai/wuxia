@@ -161,7 +161,7 @@ export function treeScreen(p: Player, selected: string | null) {
     focusState === 'allocated'
       ? `<p class="tree-owned">${focus.kind === 'origin' ? 'Your origin · free' : 'Allocated'}</p>`
       : focus.kind === 'origin'
-        ? '<p class="muted">Other origins are free junctions once your path reaches them.</p>'
+        ? '<p class="muted">Other schools’ origins cost nothing once your path reaches them.</p>'
         : `<button data-command="tree-allocate" data-value="${esc(focus.id)}"${reason ? ' disabled' : ''}>Allocate ${esc(focus.name)}</button><small>${esc(reason ?? 'Spends 1 Skill Point')}</small>`;
 
   const free = freeSkillPoints(p);
@@ -173,11 +173,11 @@ export function treeScreen(p: Player, selected: string | null) {
       <h3>${esc(focus.name)}</h3>
       <p class="muted">${esc(focus.kind)} · ${esc(focus.region)}${focus.placeholder ? ' · placeholder' : ''} · ${stateLabels[focusState]}</p>
       ${focus.description ? `<p>${esc(focus.description)}</p>` : ''}
-      ${focus.effects.length ? `<ul class="tree-effects">${focus.effects.map((effect) => `<li>${esc(describeTreeEffect(effect))}</li>`).join('')}</ul>` : '<p class="muted">No bonus of its own; it extends your path.</p>'}
+      ${focus.effects.length ? `<ul class="tree-effects">${focus.effects.map((effect) => `<li>${esc(describeTreeEffect(effect))}</li>`).join('')}</ul>` : '<p class="muted">A stepping stone to what lies beyond.</p>'}
       ${action}
       <h3>Your tree bonuses</h3>
       ${bonusSummary(p)}
-      <p class="muted tree-hint">Allocate nodes connected to your path. Tree nodes and technique ranks share Skill Points; the Mentor upstairs refunds both.</p>
+      <p class="muted tree-hint">Spend Skill Points on nodes next to your path. The Mentor can refund them.</p>
     </aside>
   </div>`;
 }

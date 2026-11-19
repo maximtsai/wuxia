@@ -52,7 +52,7 @@ export const rooms = {
   },
   monster: {
     name: 'Monster Gate',
-    landmark: 'Optional monster portal',
+    landmark: 'A portal that hums with something feral',
     exits: { left: 'statue', up: 'training' },
   },
   training: {
@@ -118,7 +118,7 @@ const prop = (
 ): Interactable => ({ id, name, blurb, x, y, actions });
 export const interactables: Record<RoomId, readonly Interactable[]> = {
   entry: [
-    npc('keeper', 'Keeper', 'Tends the restoration alcove.', 800, [
+    npc('keeper', 'Keeper', 'Looks after tired travelers.', 800, [
       'rest',
       'dialogue',
     ]),
@@ -230,9 +230,14 @@ export const interactables: Record<RoomId, readonly Interactable[]> = {
     ),
   ],
   training: [
-    prop('wards', 'Training wards', 'Spend Energy for EXP.', 800, 470, [
-      'encounters',
-    ]),
+    prop(
+      'wards',
+      'Training wards',
+      'Practice strikes. Tiring, but you learn.',
+      800,
+      470,
+      ['encounters'],
+    ),
   ],
   ending: [
     prop(

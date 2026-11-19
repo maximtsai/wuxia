@@ -221,7 +221,7 @@ export function entryReason(s: Session, id = 'practice') {
         : s.player.life <= 0
           ? 'Recover Life first'
           : s.player.energy < (d.training?.cost ?? 10)
-            ? `Need ${d.training?.cost ?? 10} Energy — visit recovery`
+            ? `Too tired: needs ${d.training?.cost ?? 10} Energy. Rest or eat first.`
             : null;
 }
 export function beginBattle(s: Session, id = 'practice') {
