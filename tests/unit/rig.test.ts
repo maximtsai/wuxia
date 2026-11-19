@@ -11,7 +11,7 @@ import {
 
 const REACH = 54 + 54;
 const walk = (cycle: number, stride = 1) =>
-  samplePose('walk', cycle, 'balanced', stride);
+  samplePose('walk', cycle, 'balanced', { stride });
 const span = (p: ReturnType<typeof walk>, foot: Foot, near: boolean) =>
   Math.hypot(foot.x - hipOffset(p.twist, near), foot.y - (HIP_HEIGHT + p.y));
 
@@ -77,6 +77,32 @@ describe('walk cycle', () => {
         expect(span(p, p.feet.near, true)).toBeLessThan(REACH);
         expect(span(p, p.feet.far, false)).toBeLessThan(REACH);
       }
+  });
+  it('lands the leading leg almost straight, softer through stance', () => {
+    const knee = (c: number) => {
+      const p = walk(c),
+        f = p.feet.near;
+      return solveLeg(
+        f.x - hipOffset(p.twist, true),
+        f.y - (HIP_HEIGHT + p.y),
+        54,
+        54,
+      ).shin;
+    };
+    expect(knee(0)).toBeLessThan(12); // heel strike at full extension
+    expect(knee(0.25)).toBeGreaterThan(15); // mid-stance keeps a soft knee
+    expect(knee(0.25)).toBeLessThan(30);
+  });
+  it('keeps a standing knee only softly bent', () => {
+    const p = samplePose('idle', 0, 'balanced'),
+      f = p.feet.near;
+    const { shin } = solveLeg(
+      f.x - hipOffset(0, true),
+      f.y - (HIP_HEIGHT + p.y),
+      54,
+      54,
+    );
+    expect(shin).toBeLessThan(35);
   });
   it('lifts the pelvis over mid-stance and drops it through double support', () => {
     // Negative y is higher. Double support sits at cycle 0 and 0.5; each leg's

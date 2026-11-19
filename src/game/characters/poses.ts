@@ -1,18 +1,32 @@
 import type { ClassId } from '../../content/phase2';
 import { smooth } from './kinematics';
+import { applyKeys, isKeyed, keyedDuration, type KeyedMotion } from './strikes';
 
-export type Motion =
-  'idle' | 'walk' | 'attack' | 'hit' | 'guard' | 'drink' | 'qi' | 'defeat';
-export const motionDuration: Record<Motion, number> = {
+type PosedMotion =
+  | 'idle'
+  | 'walk'
+  | 'run'
+  | 'hit'
+  | 'guard'
+  | 'drink'
+  | 'qi'
+  | 'defeat'
+  | 'meditate';
+export type Motion = PosedMotion | KeyedMotion;
+const motionDuration: Record<PosedMotion, number> = {
   idle: Infinity,
   walk: Infinity,
-  attack: 0.78,
+  run: Infinity,
   hit: 0.4,
   guard: 1.0,
   drink: 1.4,
   qi: 1.25,
   defeat: 1.1,
+  meditate: Infinity,
 };
+/** How long `motion` runs; keyed strikes lengthen with each extra blow. */
+export const durationOf = (motion: Motion, hits = 1) =>
+  isKeyed(motion) ? keyedDuration(motion, hits) : motionDuration[motion];
 export const characterSkins: Record<
   ClassId,
   { cloth: number; accent: number; stance: number }
@@ -27,8 +41,12 @@ export const characterSkins: Record<
 const STANCE = 0.6;
 /** Ankle height at contact, in rig-local units above the root. */
 const GROUND = -7;
-/** Hip height above the root. Leg reach is 108, so this leaves the knee bent. */
-export const HIP_HEIGHT = -102;
+/** Hip height above the root. Leg reach is 108, so this leaves a soft knee. */
+export const HIP_HEIGHT = -109;
+/** Hip-to-ankle length of a walking stance leg (~20° of knee) and of the leading
+ * leg at heel strike, which straightens almost fully (~10°) for that instant. */
+const STANCE_LEG = 106.3,
+  STRIKE_LEG = 107.6;
 const MIN_RANGE = 16,
   MAX_RANGE = 33;
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
@@ -41,6 +59,13 @@ export const footRange = (stride: number) =>
  */
 export const cycleDistance = (stride: number) =>
   (footRange(stride) * 2) / STANCE;
+/**
+ * A run plants each foot for barely a third of the cycle, so both are off the
+ * ground twice per cycle; that flight phase is what separates it from a walk.
+ */
+const RUN_STANCE = 0.35,
+  RUN_RANGE = 30;
+export const runCycleDistance = (RUN_RANGE * 2) / RUN_STANCE;
 
 /**
  * Depth offsets that keep the near and far limbs off a single pin joint, which
@@ -56,15 +81,17 @@ export const shoulderOffset = (twist: number, near: boolean) =>
 
 export type Limb = { upper: number; lower: number };
 export type Foot = { x: number; y: number; toe: number };
+/** Explicit hip/knee angles, for folded poses the two-bone solver cannot reach. */
+export type LegAngles = { thigh: number; shin: number };
 
 export function samplePose(
   motion: Motion,
   elapsed: number,
   origin: ClassId,
-  stride = 0.85,
+  { stride = 0.85, hits = 1 }: { stride?: number; hits?: number } = {},
 ) {
   const time = Math.max(0, elapsed),
-    phase = Math.min(1, time / motionDuration[motion]);
+    phase = Math.min(1, time / durationOf(motion, hits));
   const stance = characterSkins[origin].stance;
   const p = {
     x: 0,
@@ -92,6 +119,8 @@ export function samplePose(
     bottle: false,
     palm: false,
     alpha: 1,
+    /** Overrides the foot-target IK when set; `feet[].toe` still angles the foot. */
+    legs: null as null | { near: LegAngles; far: LegAngles },
   };
   const hold = smooth(phase / 0.2) * (1 - smooth((phase - 0.75) / 0.25));
   if (motion === 'idle') {
@@ -131,13 +160,28 @@ export function samplePose(
     };
     p.feet.near = step(cycle);
     p.feet.far = step((cycle + 0.5) % 1);
-    // Pelvis vaults over the straight stance leg and drops through double support.
-    p.y = Math.cos(cycle * Math.PI * 4) * range * 0.09;
     p.lean = 2;
     p.head = -2; // gaze stays level through the forward lean
     // Near foot leads at cycle 0, so the near arm is furthest back there.
     const swing = Math.cos(cycle * Math.PI * 2);
     p.twist = -swing * 7; // shoulders counter-rotate against the pelvis
+    // Pelvis rides the stance legs like an inverted pendulum: it vaults over
+    // mid-stance and drops through double support just far enough that the
+    // leading leg lands nearly straight, then softens again as it loads.
+    let hip = -Infinity;
+    for (const [t, foot, near] of [
+      [cycle, p.feet.near, true],
+      [(cycle + 0.5) % 1, p.feet.far, false],
+    ] as const) {
+      if (t >= STANCE && t < 0.85) continue; // lifted clear, leg hangs free
+      const fromStrike = t < 0.5 ? t : 1 - t;
+      const leg =
+        STANCE_LEG +
+        (STRIKE_LEG - STANCE_LEG) * (1 - smooth(fromStrike / 0.15));
+      const dx = foot.x - hipOffset(p.twist, near);
+      hip = Math.max(hip, foot.y - Math.sqrt(leg * leg - dx * dx));
+    }
+    p.y = hip - HIP_HEIGHT;
     const reach = 10 + 18 * clamp01(stride);
     p.arms.near = {
       upper: -5 + swing * reach,
@@ -149,26 +193,48 @@ export function samplePose(
       lower: -10 - (1 + swing) * 15,
     };
     p.cloth = Math.sin(cycle * Math.PI * 2 - 0.5) * 4;
-  } else if (motion === 'attack') {
-    const wind = smooth(phase / 0.28),
-      strike = smooth((phase - 0.28) / 0.13);
-    const recover = 1 - smooth((phase - 0.62) / 0.38);
-    p.x = (-6 * wind + 23 * strike) * recover;
-    p.y = 3 * strike * recover;
-    p.lean += (-7 * wind + 18 * strike) * recover;
-    p.spine = (-4 * wind + 9 * strike) * recover;
-    p.twist = (7 * wind - 12 * strike) * recover;
-    p.arms.near.upper += (42 * wind - 106 * strike) * recover;
-    p.arms.near.lower += (-48 * wind + 52 * strike) * recover;
-    p.wrist += (-25 * wind + 30 * strike) * recover;
-    p.arms.far.upper += 12 * wind * recover;
-    p.head = -p.lean * 0.55;
-    p.feet.near.x += 10 * strike * recover;
-    p.cloth = -p.lean * 0.4;
-    p.slash =
-      phase > 0.32 && phase < 0.6
-        ? Math.sin(((phase - 0.32) / 0.28) * Math.PI)
+  } else if (motion === 'run') {
+    const cycle = time % 1,
+      span = RUN_RANGE * 2;
+    const step = (t: number): Foot => {
+      const swing = t >= RUN_STANCE,
+        u = swing ? (t - RUN_STANCE) / (1 - RUN_STANCE) : t / RUN_STANCE;
+      const tangent = (-span * (1 - RUN_STANCE)) / RUN_STANCE;
+      // The heel kicks up behind early in the swing, then the knee drives
+      // through high and the foot reaches forward to land under the body.
+      const lift = swing
+        ? Math.sin(u * Math.PI) ** 1.3 * 38 +
+          Math.sin(Math.min(1, u / 0.55) * Math.PI) * 14
         : 0;
+      // Lands on the midfoot, pushes off over the ball, levels out in flight.
+      const toe = swing
+        ? 30 * (1 - smooth(u / 0.5))
+        : 30 * smooth((u - 0.5) / 0.5);
+      const roll = toe > 0 ? Math.sin((toe * Math.PI) / 180) * 9 : 0;
+      return {
+        x: swing
+          ? -RUN_RANGE +
+            span * smooth(u) +
+            tangent * (2 * u ** 3 - 3 * u ** 2 + u)
+          : RUN_RANGE - span * u,
+        y: GROUND - lift - roll,
+        toe,
+      };
+    };
+    p.feet.near = step(cycle);
+    p.feet.far = step((cycle + 0.5) % 1);
+    // Unlike the walk, the body is lowest at mid-stance, where the leg
+    // compresses, and highest in flight between contacts.
+    p.y = 6 + Math.cos(Math.PI * 4 * (cycle - RUN_STANCE / 2)) * 4;
+    p.lean = 9;
+    p.spine = 2;
+    p.head = -7;
+    const swing = Math.cos(cycle * Math.PI * 2);
+    p.twist = -swing * 9;
+    // Elbows stay bent near a right angle and pump from the shoulder.
+    p.arms.near = { upper: -10 + swing * 38, lower: -85 - swing * 10 };
+    p.arms.far = { upper: -10 - swing * 38, lower: -85 + swing * 10 };
+    p.cloth = Math.sin(cycle * Math.PI * 2 - 0.5) * 7 - 4;
   } else if (motion === 'hit') {
     const recoil = Math.sin(phase * Math.PI);
     p.x = -recoil * 7;
@@ -199,6 +265,25 @@ export function samplePose(
     p.cloth -= hold * 4;
     p.lean += hold * 3;
     p.spine += hold * 4;
+  } else if (motion === 'meditate') {
+    // Seated cross-legged: hips on the floor, thighs forward along it and
+    // shins folded back under them. A foot beside the hip would make IK point
+    // the knee straight up, so this pose sets the leg angles directly.
+    const breathe = Math.sin(time * 1.8);
+    p.y = 88; // hips 21 above the root, knees and ankles just off the floor
+    p.lean = 0;
+    p.spine = -2;
+    p.head = 5 + breathe * 0.6; // eyes lowered
+    p.breath = breathe * 1.6;
+    p.legs = {
+      near: { thigh: -78, shin: 163 },
+      far: { thigh: -86, shin: 170 },
+    };
+    p.feet.near.toe = p.feet.far.toe = 20;
+    // Hands rest on the thighs, just short of the knees.
+    p.arms.near = { upper: -12, lower: -30 };
+    p.arms.far = { upper: -6, lower: -34 };
+    p.cloth = breathe * 0.8;
   } else if (motion === 'defeat') {
     const collapse = smooth(phase);
     p.x = collapse * 8;
@@ -209,6 +294,14 @@ export function samplePose(
     p.arms.near = { upper: collapse * 18, lower: -15 };
     p.wrist = 110 - p.lean - p.arms.near.upper - p.arms.near.lower;
     p.alpha = 1 - collapse * 0.2;
+  } else if (isKeyed(motion)) {
+    // Gestures happen out of combat, so they start from relaxed idle arms
+    // rather than the fists-up guard every strike begins from.
+    if (motion === 'salute' || motion === 'purchase') {
+      p.arms.near = { upper: -8, lower: -8 };
+      p.arms.far = { upper: 10, lower: -6 };
+    }
+    applyKeys(p, motion, time, hits);
   }
   return p;
 }
