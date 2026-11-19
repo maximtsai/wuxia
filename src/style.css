@@ -1508,10 +1508,10 @@ main.overworld {
   color: #f5dfae;
   background: #0006;
 }
-button[data-command='map']::after {
+.world-dock button[data-command='map']::after {
   content: 'M';
 }
-button[data-command='journal']::after {
+.world-dock button[data-command='journal']::after {
   content: 'J';
 }
 .world-dock button[data-command='progression']::after {
@@ -2052,4 +2052,90 @@ kbd {
 }
 .skill-button:has(.hotkey) {
   padding-right: 30px;
+}
+
+/* Gold digits in the body font: Marcellus draws 0 like the letter O. */
+.gold-counter {
+  font-family: 'Noto Sans', sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* Resource icons. */
+.ico {
+  width: 1.05em;
+  height: 1.05em;
+  vertical-align: -0.15em;
+  margin-right: 3px;
+  flex: none;
+}
+.ico-life {
+  color: var(--life);
+}
+.ico-qi {
+  color: var(--qi);
+}
+.ico-energy {
+  color: var(--gold);
+}
+.ico-gold {
+  color: var(--gold);
+}
+.resource > span {
+  display: inline-flex;
+  align-items: center;
+}
+.combat-stats span,
+.training-energy {
+  display: inline-flex;
+  align-items: center;
+}
+/* Temple map: rooms on a grid with their connections drawn behind them. */
+.temple-map {
+  position: relative;
+  gap: 0;
+}
+.temple-map > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.temple-map line {
+  stroke: #6a5639;
+  stroke-width: 3;
+}
+.temple-map line.near {
+  stroke: var(--gold);
+}
+.temple-map line.locked {
+  stroke-dasharray: 6 6;
+}
+.temple-map .map-room {
+  position: relative;
+  margin: 5px 10%;
+  padding: 4px 6px;
+  display: grid;
+  align-content: center;
+  gap: 1px;
+  text-align: center;
+  min-height: 34px;
+  background: var(--ink-1);
+}
+.temple-map button.map-room {
+  background: linear-gradient(var(--btn-top), var(--btn-bottom));
+}
+.temple-map button.map-room:disabled {
+  background: var(--ink-1);
+}
+.temple-map .map-room.here {
+  border: 2px solid var(--gold-bright);
+  box-shadow: 0 0 14px #e3bf6c55;
+}
+.temple-map .map-room small {
+  font-size: 0.8em;
+  color: var(--text-muted);
 }

@@ -267,6 +267,8 @@ export interface ActionInfo {
   target: Skill['target'];
   /** Present for limited-use techniques; `left` counts the current encounter. */
   uses?: { left: number; max: number };
+  /** Rank and learning requirements, for the ranks screen (not shown in combat). */
+  requirements?: string;
 }
 export function actionInfo(s: Session, id: CombatAction): ActionInfo {
   if (id === 'potion0' || id === 'potion1') {
@@ -303,7 +305,9 @@ export function actionInfo(s: Session, id: CombatAction): ActionInfo {
   );
   return {
     name: d.name,
-    detail: `${d.description}${d.percent !== undefined ? ` Deals ${d.percent}% of ${d.effect === 'avenger' ? 'your missing Life' : "the target's current Life"}.` : ''}${d.noCrit ? ' Cannot critically strike.' : ''}${d.hits ? ` Power ${Math.floor(power)} per hit before defense and critical.` : ''}${d.effect === 'heal' ? ` Restores ${healAmount(s.player, rank)} Life.` : ''} Rank ${rank}/10. Requires level ${d.level}${d.requires.length ? ', ' + d.requires.map((v) => skills[v as SkillId].name).join(', ') : ''}.`,
+    detail:
+      `${d.description}${d.percent !== undefined ? ` Deals ${d.percent}% of ${d.effect === 'avenger' ? 'your missing Life' : "the target's current Life"}.` : ''}${d.noCrit ? ' Cannot critically strike.' : ''}${d.hits ? ` Power ${Math.floor(power)} per hit before defense and critical.` : ''}${d.effect === 'heal' ? ` Restores ${healAmount(s.player, rank)} Life.` : ''}`.trim(),
+    requirements: `Rank ${rank}/10. Requires level ${d.level}${d.requires.length ? ', ' + d.requires.map((v) => skills[v as SkillId].name).join(', ') : ''}.`,
     cost: d.cost,
     target: d.target,
     uses:

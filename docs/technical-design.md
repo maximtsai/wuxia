@@ -279,7 +279,16 @@ walking hint (WASD, arrows, or a click; a tap icon on touch) until the player fi
 moves. Skill buttons carry a key-cap badge for their 1–9 hotkey. Key caps
 (`.kbd-only`) hide on coarse-pointer touch screens, where `.touch-only` cues show
 instead. Combat log lines name fighters ("Thief takes 30 damage.") rather than
-internal ids. Nearby services have an
+internal ids. The map draws rooms on a grid with their
+connections; neighbouring rooms are travel buttons and locked routes are dashed.
+Resource icons (Life, Qi, Energy, gold) replace the words in the HUD, combat
+strip, action costs and encounter list, and enemy intents carry a glyph on the
+canvas (blade, qi orb, cross, shield). Objects with one action use it on E or a
+tap; objects with several open their card. Fast combat (options menu, saved in
+preferences) runs animations and enemy turns at double speed. Opening a menu
+focuses its main action. "Continue saved game" appears only when a save exists.
+Clicking outside the window releases held keys but does not pause; hiding the tab
+does. Nearby services have an
 accessible E/tap prompt; existing interaction cards and shop panels remain.
 Phones place controls below the room to keep text and touch targets readable.
 

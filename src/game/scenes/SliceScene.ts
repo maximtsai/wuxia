@@ -1,4 +1,6 @@
 import { bottleDock } from '../bottleDock';
+import { icon } from '../icons';
+import { loadPreferences, savePreferences } from '../../platform/preferences';
 import { classSelection } from '../classSelection';
 import { CharacterStage } from '../characters/CharacterStage';
 
@@ -81,11 +83,34 @@ import {
   xpToNext,
 } from '../../core/progression';
 import { treeScreen } from '../treeScreen';
-import { load, save, type StoragePort } from '../../platform/save';
+import { load, save, SAVE_KEY, type StoragePort } from '../../platform/save';
 import { frameSeconds } from '../../core/time';
 const storage: StoragePort = {
   getItem: (k) => localStorage.getItem(k),
   setItem: (k, v) => localStorage.setItem(k, v),
+};
+/** Map grid cells [column, row]; must match `.map-room[data-room]` in style.css. */
+const mapCells: Record<RoomId, [number, number]> = {
+  rift: [1, 1],
+  training: [3, 1],
+  riftEntry: [1, 2],
+  statue: [2, 2],
+  monster: [3, 2],
+  library: [1, 3],
+  advanced: [2, 3],
+  upstairs: [3, 3],
+  human: [1, 4],
+  potions: [2, 4],
+  merchant: [3, 4],
+  entry: [2, 5],
+  ending: [2, 6],
+};
+const hasSave = () => {
+  try {
+    return !!localStorage.getItem(SAVE_KEY);
+  } catch {
+    return false;
+  }
 };
 type Menu =
   | 'equipment'
@@ -125,6 +150,10 @@ export class SliceScene extends Phaser.Scene {
   private suppressClick = false;
   /** Shown on a new game until the player first moves. */
   private walkHint = false;
+  /** Set when a menu opens so its main action takes focus. */
+  private focusMenu = false;
+  /** 2 when Fast combat is on: animations and enemy turns run twice as fast. */
+  private combatSpeed = loadPreferences(localStorage).fastCombat ? 2 : 1;
   /** Notices fade after a few seconds. */
   private shownNotice = '';
   private noticeTimer = 0;
@@ -179,10 +208,7 @@ export class SliceScene extends Phaser.Scene {
     this.characters = new CharacterStage(this);
     this.events.once('shutdown', () => this.characters.destroy());
     this.panel = document.querySelector<HTMLElement>('#interface')!;
-    document.querySelector('h1')!.textContent = theme.title;
     document.title = theme.title;
-    document.querySelector('header span')!.textContent =
-      'Temple campaign · Phase 3';
     this.graphics = this.add.graphics();
     const abort = new AbortController(),
       options = { signal: abort.signal };
@@ -283,7 +309,10 @@ export class SliceScene extends Phaser.Scene {
       this.stopMovement();
       this.render();
     };
-    window.addEventListener('blur', pause, options);
+    // Clicking outside the window does not pause; it only releases held keys,
+    // whose keyup would otherwise never arrive and leave the player walking.
+    window.addEventListener('blur', () => this.keys.clear(), options);
+    // Hiding the tab or minimising still pauses.
     document.addEventListener(
       'visibilitychange',
       () => {
@@ -398,6 +427,29 @@ export class SliceScene extends Phaser.Scene {
     this.events.once('shutdown', () => abort.abort());
     this.render();
   }
+  /** A small glyph for what an enemy intends: blade, qi orb, cross or shield. */
+  private intentIcon(
+    g: Phaser.GameObjects.Graphics,
+    kind: 'physical' | 'magic' | 'heal' | 'guard',
+    x: number,
+    y: number,
+  ) {
+    if (kind === 'physical') {
+      g.lineStyle(5, 0xf3e7cb).lineBetween(x - 12, y + 12, x + 12, y - 12);
+      g.lineStyle(5, 0xe3bf6c).lineBetween(x - 12, y - 2, x - 2, y + 8);
+    } else if (kind === 'magic') {
+      g.fillStyle(0x7fb6d6).fillCircle(x, y, 9);
+      g.lineStyle(3, 0x7fb6d6).strokeCircle(x, y, 15);
+    } else if (kind === 'heal') {
+      g.fillStyle(0x93c79c)
+        .fillRect(x - 4, y - 14, 8, 28)
+        .fillRect(x - 14, y - 4, 28, 8);
+    } else {
+      g.fillStyle(0xe3bf6c)
+        .fillRect(x - 12, y - 13, 24, 15)
+        .fillTriangle(x - 12, y + 2, x + 12, y + 2, x, y + 15);
+    }
+  }
   private dismissWalkHint() {
     if (!this.walkHint) return;
     this.walkHint = false;
@@ -441,6 +493,19 @@ export class SliceScene extends Phaser.Scene {
       return;
     }
     this.optionsOpen = false;
+    if (command === 'fast-combat') {
+      this.combatSpeed = this.combatSpeed === 2 ? 1 : 2;
+      try {
+        savePreferences(storage, {
+          ...loadPreferences(storage),
+          fastCombat: this.combatSpeed === 2,
+        });
+      } catch {
+        // Preferences are a convenience; the toggle still applies this session.
+      }
+      this.render();
+      return;
+    }
     if (command === 'close-card') {
       this.interacting = null;
       this.render();
@@ -597,6 +662,7 @@ export class SliceScene extends Phaser.Scene {
       ) {
         const menu = command as Menu;
         this.menu = this.menu === menu ? null : menu;
+        this.focusMenu = !!this.menu;
         this.respecOpen = false;
         this.notice = '';
         // Greeting whoever tends this room as the conversation opens.
@@ -660,7 +726,7 @@ export class SliceScene extends Phaser.Scene {
   update(_time: number, delta: number) {
     if (this.paused) return;
     this.characters.sync(this.session);
-    this.characters.tick(delta);
+    for (let i = 0; i < this.combatSpeed; i++) this.characters.tick(delta);
     // Readouts follow the animation, so a landing blow refreshes the panel.
     const settling = !!this.session.battle && this.characters.settling();
     if (settling !== this.settling) {
@@ -671,7 +737,7 @@ export class SliceScene extends Phaser.Scene {
       this.session.battle &&
       ['enemy', 'shadow'].includes(this.session.battle.turn)
     ) {
-      this.enemyWait -= frameSeconds(delta) * 1000;
+      this.enemyWait -= frameSeconds(delta) * 1000 * this.combatSpeed;
       // Let the last exchange finish on screen before the next one starts.
       if (this.enemyWait <= 0 && !this.characters.busy()) {
         dispatchCombatCommand(this.session, {
@@ -731,6 +797,12 @@ export class SliceScene extends Phaser.Scene {
   /** Opens the nearby object's card and focuses its first action. */
   private interact() {
     if (!this.nearby || this.paused || this.menu || this.session.battle) return;
+    // A single-action object just does it; the card is for choices.
+    if (this.nearby.actions.length === 1) {
+      this.stopMovement();
+      this.command(this.nearby.actions[0]);
+      return;
+    }
     this.interacting = this.nearby;
     this.stopMovement();
     this.render();
@@ -768,7 +840,11 @@ export class SliceScene extends Phaser.Scene {
       .querySelector('main')!
       .classList.toggle('overworld', !b && !selecting);
     if (selecting)
-      this.panel.innerHTML = classSelection(this.notice, this.previewClass);
+      this.panel.innerHTML = classSelection(
+        this.notice,
+        this.previewClass,
+        hasSave(),
+      );
     else if (!b) this.renderOverworld();
     else {
       const done = ['victory', 'defeat', 'finished'].includes(b.turn),
@@ -808,7 +884,7 @@ export class SliceScene extends Phaser.Scene {
           bottle
             ? `${bottle.charges}/${potions[bottle.type].charges} left`
             : '',
-          a.cost ? `${a.cost} Qi` : '',
+          a.cost ? `${icon('qi', 'Qi cost ')}${a.cost}` : '',
           a.uses ? `${a.uses.left}/${a.uses.max} uses` : '',
         ]
           .filter(Boolean)
@@ -866,10 +942,12 @@ export class SliceScene extends Phaser.Scene {
             : '';
       // Only what this turn needs: resources, shields and effects in play.
       const strip = [
-        `Life ${shownLife('player', p.life, p.maxLife)}/${p.maxLife}`,
-        `Qi ${p.mana}/${p.maxMana}`,
+        `${icon('life', 'Life ')}${shownLife('player', p.life, p.maxLife)}/${p.maxLife}`,
+        `${icon('qi', 'Qi ')}${p.mana}/${p.maxMana}`,
         b.playerShield ? `Shield ${b.playerShield}` : '',
-        training ? `Energy ${Math.floor(p.energy)}/${p.maxEnergy}` : '',
+        training
+          ? `${icon('energy', 'Energy ')}${Math.floor(p.energy)}/${p.maxEnergy}`
+          : '',
         b.guard ? `Guard ${b.guard}` : '',
         b.statuses.length ? statuses(b.statuses) : '',
         b.shadow?.life
@@ -914,6 +992,11 @@ export class SliceScene extends Phaser.Scene {
           : this.options([
               [this.paused ? 'Resume' : 'Pause', 'pause', 'Esc'],
               [
+                `Fast combat: ${this.combatSpeed === 2 ? 'on' : 'off'}`,
+                'fast-combat',
+                '',
+              ],
+              [
                 training ? 'End training' : 'Retreat',
                 'return',
                 '',
@@ -939,6 +1022,15 @@ export class SliceScene extends Phaser.Scene {
       );
       candidate?.focus({ preventScroll: true });
     }
+    if (this.focusMenu) {
+      this.focusMenu = false;
+      const modal = this.panel.querySelector('.world-modal');
+      (
+        modal?.querySelector<HTMLButtonElement>(
+          'button[data-command="fight"]:not([disabled])',
+        ) ?? modal?.querySelector<HTMLButtonElement>('button:not([disabled])')
+      )?.focus({ preventScroll: true });
+    }
     if (wasSelecting && !selecting) {
       this.scale.setGameSize(1600, 900);
       this.scale.refresh();
@@ -963,31 +1055,41 @@ export class SliceScene extends Phaser.Scene {
         .join(
           '',
         )}<p>${w.cleared.human === 20 ? 'Main objective complete. Return to Entry and take the downward exit.' : 'Next objective: Human Gateway stage ' + (w.cleared.human + 1)}</p><p>${w.delivery ? 'Delivery: take the parcel to the Library.' : 'No active delivery.'} Completed deliveries: ${w.deliveries}</p><p>${w.endingSeen ? 'Ending reached. Optional portals remain available.' : 'Ending not yet visited.'}</p>${this.button('Close journal', 'journal')}`;
-    if (this.menu === 'map')
-      return `<h2>Temple map</h2><p>Your current room is highlighted. Walk through a doorway, or travel to a neighbouring room:</p><div class="map-travel">${Object.values(
-        rooms[w.room].exits,
+    if (this.menu === 'map') {
+      const here = w.room,
+        exits = Object.values(rooms[here].exits) as RoomId[],
+        locked = (id: RoomId) =>
+          (id === 'rift' || id === 'ending') && w.cleared.human < 20;
+      const seen = new Set<string>(),
+        lines = (Object.keys(rooms) as RoomId[])
+          .flatMap((a) =>
+            (Object.values(rooms[a].exits) as RoomId[]).map((b) => [a, b]),
+          )
+          .filter(([a, b]) => {
+            const key = [a, b].sort().join();
+            return !seen.has(key) && !!seen.add(key);
+          })
+          .map(([a, b]) => {
+            const [ax, ay] = mapCells[a as RoomId],
+              [bx, by] = mapCells[b as RoomId];
+            return `<line x1="${ax - 0.5}" y1="${ay - 0.5}" x2="${bx - 0.5}" y2="${by - 0.5}" class="${locked(a as RoomId) || locked(b as RoomId) ? 'locked' : ''}${exits.includes(b as RoomId) && a === here ? ' near' : exits.includes(a as RoomId) && b === here ? ' near' : ''}" vector-effect="non-scaling-stroke"/>`;
+          })
+          .join('');
+      return `<h2>Temple map</h2><p class="muted">Select a neighbouring room to travel there.</p><div class="temple-map"><svg viewBox="0 0 3 6" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>${(
+        Object.keys(rooms) as RoomId[]
       )
-        .map((to) =>
-          this.button(
-            'Go · ' + rooms[to as RoomId].name,
-            'travel',
-            to,
-            !!travelReason(this.session, to),
-          ),
-        )
-        .join('')}</div><div class="temple-map">${Object.entries(rooms)
-        .map(
-          ([id, d]) =>
-            `<div class="map-room ${id === w.room ? 'selected' : ''}" data-room="${id}"><strong>${d.name}${id === w.room ? ' · You' : ''}</strong><small>${Object.entries(
-              d.exits,
-            )
-              .map(
-                ([direction, to]) =>
-                  direction + ': ' + rooms[to as RoomId].name,
-              )
-              .join('<br>')}</small></div>`,
-        )
+        .map((id) => {
+          const name = rooms[id].name;
+          if (id === here)
+            return `<div class="map-room here" data-room="${id}"><strong>${name}</strong><small>You are here</small></div>`;
+          if (exits.includes(id)) {
+            const why = travelReason(this.session, id);
+            return `<button class="map-room" data-room="${id}" data-command="travel" data-value="${id}" aria-label="Go to ${name}" ${why ? 'disabled' : ''}><strong>${name}</strong>${why ? `<small>${why}</small>` : ''}</button>`;
+          }
+          return `<div class="map-room" data-room="${id}"><strong>${name}</strong></div>`;
+        })
         .join('')}</div>${this.button('Close map', 'map')}`;
+    }
     if (this.menu === 'equipment')
       return `<h2>Equipment</h2><p>Strength ${p.strength} · Equipped ${theme.weapons[p.weapon]}</p><div class="controls">${p.inventory.map((id) => this.button(`${theme.weapons[id]} · +${weapons[id].damage} damage${id === p.weapon ? ' · Equipped' : ''}`, 'equip', id, id === p.weapon)).join('')}${this.button(p.shieldEquipped ? 'Unequip buckler' : 'Equip buckler', 'shield', '', p.strength < 15)}</div><p>Buckler requires 15 Strength; starts each battle with ${20 + p.level * 3} shield. Physical and qi defenses come from your class.</p>${this.button('Close equipment', 'equipment')}`;
     if (this.menu === 'skills') return treeScreen(p, this.treeSelected);
@@ -999,7 +1101,7 @@ export class SliceScene extends Phaser.Scene {
         .map((id) => {
           const d = skills[id],
             reason = learnReason(p, id);
-          return `<div class="potion-offer"><strong>${d.icon} ${d.name} · ${p.ranks[id] ?? 0}/10${d.kind === 'passive' ? ' · Passive' : ''}</strong><p>${actionInfo(this.session, id).detail}</p>${this.button('Learn ' + d.name, 'learn', id, !!reason)}<small>${reason ?? 'Spend 1 Skill Point'}</small></div>`;
+          return `<div class="potion-offer"><strong>${d.name} · ${p.ranks[id] ?? 0}/10${d.kind === 'passive' ? ' · Passive' : ''}</strong><p>${actionInfo(this.session, id).detail} ${actionInfo(this.session, id).requirements ?? ''}</p>${this.button('Learn ' + d.name, 'learn', id, !!reason)}<small>${reason ?? 'Spend 1 Skill Point'}</small></div>`;
         })
         .join('')}${this.button('Close technique ranks', 'ranks')}`;
     if (this.menu === 'progression') {
@@ -1062,7 +1164,7 @@ export class SliceScene extends Phaser.Scene {
       return `<h2>${training ? 'Training' : portals[portal].name}</h2>${training ? '' : `<p class="muted">Cleared ${cleared}/${portals[portal].count}${portal !== 'human' && cleared ? ' · cleared stages can be replayed' : ''}</p>`}${shown.length ? '' : '<p>Every stage is cleared.</p>'}${shown
         .map(
           ([id, d]) =>
-            `<div class="potion-offer"><strong>${d.name}</strong><p>Suggested level ${d.level} · ${d.enemies.length} opponent(s)<br>${d.training ? d.training.cost + ' Energy and ' + d.training.xp + ' EXP per damaging hit; double EXP once the shield is depleted.' : `10 Energy entry · ${d.xp} EXP · ${d.gold} gold`}</p>${this.button('Enter ' + d.name, 'fight', id, !!entryReason(this.session, id))}${entryReason(this.session, id) ? `<small>${entryReason(this.session, id)}</small>` : ''}</div>`,
+            `<div class="potion-offer"><strong>${d.name}</strong><p>Suggested level ${d.level} · ${d.enemies.length} opponent(s)<br>${d.training ? d.training.cost + ' Energy and ' + d.training.xp + ' EXP per damaging hit; double EXP once the shield is depleted.' : `${icon('energy', 'Energy ')}10 to enter · ${d.xp} EXP · ${icon('gold', 'Gold ')}${d.gold}`}</p>${this.button('Enter ' + d.name, 'fight', id, !!entryReason(this.session, id))}${entryReason(this.session, id) ? `<small>${entryReason(this.session, id)}</small>` : ''}</div>`,
         )
         .join('')}${this.button('Close encounters', 'encounters')}`;
     }
@@ -1095,7 +1197,7 @@ export class SliceScene extends Phaser.Scene {
   private renderOverworld() {
     const p = this.session.player;
     const meter = (name: string, v: number, max: number, kind: string) =>
-      `<div class="resource ${kind}"><span>${name}</span><strong>${Math.floor(v)} / ${max}</strong><meter aria-label="${name}" min="0" max="${max}" value="${v}"></meter></div>`;
+      `<div class="resource ${kind}"><span title="${name}">${icon(kind === 'mana' ? 'qi' : 'life', name)}</span><strong>${Math.floor(v)} / ${max}</strong><meter aria-label="${name}" min="0" max="${max}" value="${v}"></meter></div>`;
     const w = this.session.world,
       room = rooms[w.room];
     const actionLabels: Record<string, string> = {
@@ -1154,8 +1256,8 @@ export class SliceScene extends Phaser.Scene {
         : doorway
           ? `<aside class="interact-card glass" style="${at(doorways[doorway[0] as ExitDirection].x, doorways[doorway[0] as ExitDirection].y + (doorway[0] === 'down' ? -60 : 110))}"><strong>${rooms[doorway[1] as RoomId].name}</strong><p>${travelReason(this.session, doorway[1])}</p></aside>`
           : '';
-    this.panel.innerHTML = `<div class="player-hud glass stats"><div class="portrait stick-portrait" aria-hidden="true"><span></span></div><div class="player-resources"><strong>${p.classId ? classes[p.classId].name : theme.player} · Lv ${p.level}</strong><meter class="xp-bar" aria-label="EXP" title="EXP ${p.xp} / ${xpToNext(p.level)}" min="0" max="${xpToNext(p.level)}" value="${p.xp}"></meter>${meter('Life', p.life, p.maxLife, 'life')}${meter('Qi', p.mana, p.maxMana, 'mana')}<small class="training-energy" title="Energy is spent on combat and training. Walking is free.">Training ${Math.floor(p.energy)}/${p.maxEnergy}</small></div></div>
-    <h2 class="room-title glass">${room.name}</h2><div class="world-tools glass"><span class="gold-counter"><span aria-hidden="true">◉ </span><span class="visually-hidden">Gold </span>${p.gold}</span>${
+    this.panel.innerHTML = `<div class="player-hud glass stats"><div class="portrait stick-portrait" aria-hidden="true"><span></span></div><div class="player-resources"><strong>${p.classId ? classes[p.classId].name : theme.player} · Lv ${p.level}</strong><meter class="xp-bar" aria-label="EXP" title="EXP ${p.xp} / ${xpToNext(p.level)}" min="0" max="${xpToNext(p.level)}" value="${p.xp}"></meter>${meter('Life', p.life, p.maxLife, 'life')}${meter('Qi', p.mana, p.maxMana, 'mana')}<small class="training-energy" title="Energy is spent on combat and training. Walking is free.">${icon('energy', 'Training Energy ')}${Math.floor(p.energy)}/${p.maxEnergy}</small></div></div>
+    <h2 class="room-title glass">${room.name}</h2><div class="world-tools glass"><span class="gold-counter">${icon('gold', 'Gold ')}${p.gold}</span>${
       this.paused
         ? ''
         : this.options([
@@ -1164,6 +1266,11 @@ export class SliceScene extends Phaser.Scene {
             ['Character', 'progression', 'C'],
             ['Equipment', 'equipment', 'I'],
             ['Skill tree', 'skills', 'K'],
+            [
+              `Fast combat: ${this.combatSpeed === 2 ? 'on' : 'off'}`,
+              'fast-combat',
+              '',
+            ],
             ['Pause', 'pause', 'Esc'],
           ])
     }</div>
@@ -1279,13 +1386,21 @@ export class SliceScene extends Phaser.Scene {
           `${e.shield ? `${e.shield} shield · ` : ''}${e.mana} Qi`,
           28,
         );
-        if (e.life)
+        if (e.life) {
           label(
-            x,
+            x + 22,
             220,
             b.intents[e.id].name + ' → ' + who(b.intents[e.id].target),
             30,
           );
+          const text = this.labels[this.labels.length - 1];
+          this.intentIcon(
+            g,
+            b.intents[e.id].kind,
+            x + 22 - text.width / 2 - 26,
+            220,
+          );
+        }
         if (b.selectedTarget === e.id)
           g.lineStyle(3, c.player).strokeRect(x - 60, 420, 120, 200);
       });

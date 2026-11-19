@@ -41,8 +41,8 @@ async function approach(page: Page, name: string) {
     'Press E to interact with ' + name,
     { timeout: 10_000 },
   );
+  // Single-action objects act on E; others open their card.
   await page.keyboard.press('e');
-  await expect(page.getByRole('complementary', { name })).toBeVisible();
 }
 async function use(page: Page, name: string) {
   await expect(
@@ -65,7 +65,6 @@ async function portal(page: Page, name: string) {
     page,
     interactables[id].find((i) => i.actions.includes('encounters'))!.name,
   );
-  await page.getByRole('button', { name: /^(Enter trials|Train)$/ }).click();
   await page
     .getByRole('button', { name: 'Enter ' + name, exact: true })
     .click();

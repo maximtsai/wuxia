@@ -23,7 +23,7 @@ ranks spend the same Skill Points; **Character** offers stat choices (and respec
 action and target, then confirm. All 16 active skills stay visible as temporary
 prototype content; prerequisites determine availability. Basic Attack restores 10
 Qi after resolving. Tab/Enter activates controls, keys 1–9 select skills, and
-Escape closes menus or pauses. Losing focus pauses until explicitly resumed.
+Escape closes menus or pauses. Hiding the tab or minimising pauses until explicitly resumed; clicking outside the window does not.
 
 Buy reusable bottles, equip up to two, and refill at the neighboring well. Recovery
 restores Life/Qi/Energy separately. Save/load is manual outside battle; older

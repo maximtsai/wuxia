@@ -105,5 +105,19 @@ describe('preferences foundation', () => {
     expect(decodePreferences(raw!)).toEqual(preferences);
     raw = '{"music": 2}';
     expect(loadPreferences(storage)).toEqual(defaultPreferences());
+    // Settings saved before Fast combat existed keep their other values.
+    raw = JSON.stringify({
+      music: 0.3,
+      soundEffects: 0.5,
+      reducedMotion: true,
+      screenShake: false,
+    });
+    expect(loadPreferences(storage)).toEqual({
+      music: 0.3,
+      soundEffects: 0.5,
+      reducedMotion: true,
+      screenShake: false,
+      fastCombat: false,
+    });
   });
 });

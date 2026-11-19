@@ -5,6 +5,8 @@ export interface Preferences {
   soundEffects: number;
   reducedMotion: boolean;
   screenShake: boolean;
+  /** Animations and enemy turns at double speed. */
+  fastCombat: boolean;
 }
 
 export const defaultPreferences = (): Preferences => ({
@@ -12,6 +14,7 @@ export const defaultPreferences = (): Preferences => ({
   soundEffects: 0.8,
   reducedMotion: false,
   screenShake: true,
+  fastCombat: false,
 });
 
 export interface PreferenceStorage {
@@ -32,10 +35,12 @@ export function decodePreferences(raw: string): Preferences {
     !volume(value.music) ||
     !volume(value.soundEffects) ||
     typeof value.reducedMotion !== 'boolean' ||
-    typeof value.screenShake !== 'boolean'
+    typeof value.screenShake !== 'boolean' ||
+    (value.fastCombat !== undefined && typeof value.fastCombat !== 'boolean')
   )
     throw new Error('Invalid preferences');
-  return value as Preferences;
+  // Settings saved before a field existed keep the rest and use its default.
+  return { ...defaultPreferences(), ...value } as Preferences;
 }
 
 export function loadPreferences(storage: PreferenceStorage) {
