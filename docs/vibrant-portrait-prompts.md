@@ -25,4 +25,3 @@ Use case: precise-object-edit. Edit the first image, a vertical 2:3 Shaolin stic
 Saved asset: public/images/classes/wanderer-stick-wuxia.png
 
 Use case: precise-object-edit. Edit the first image, a vertical 2:3 Shaolin stick figure class portrait. Preserve its true black stick figure with thick confident rough hand-painted stroke limbs and circular featureless head, sparse headband and sash, minimal detail, full figure and empty lower space for UI. Second image is BACKGROUND CONTRAST reference only: saturated luminous colored backdrop behind a near-black silhouette. Replace charcoal background with a vibrant colored ink-wash field filling entire canvas, brightest behind figure, slightly deeper colored edges, NOT black vignette. Simple graphic backdrop, no scenery, no text or calligraphy, no extra figures, no detailed anatomy. Vibrant luminous JADE GREEN backdrop, pale mint sash accents. Preserve exactly the low staff-sweeping pose and diagonal staff.
-

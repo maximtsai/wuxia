@@ -218,8 +218,8 @@ fixed learned skill:
 | Origin     | Immediate choices             | Intended early identity                  |
 | ---------- | ----------------------------- | ---------------------------------------- |
 | Warrior    | Stab or Guard Stance          | Direct damage or durable counterplay     |
-| Cultivator   | Qi Strike or Gather Qi        | Efficient spell damage or burst recovery |
-| Windstep | Flying Blades or Speed Strike | Multi-target pressure or fast offense    |
+| Cultivator | Qi Strike or Gather Qi        | Efficient spell damage or burst recovery |
+| Windstep   | Flying Blades or Speed Strike | Multi-target pressure or fast offense    |
 | Wanderer   | First step toward any branch  | Flexible routing with slower capstones   |
 
 Attack is universal and outside the tree, so no origin can be stranded without a
@@ -651,9 +651,9 @@ action-bar entries. The first tree uses these 10:
 | Qi            | Deep Meridian     | Placeholder: may improve Max Qi or other recovery without changing Attack's fixed 10-Qi rule.                    |
 | Qi            | Controlled Burn   | Burn lasts longer, but cannot be refreshed beyond its duration cap.                                              |
 | Qi            | Energy Field      | Increases Qi-technique damage and improves Qi Ward; it does not affect Qi Burst's Qi conversion.                 |
-| Windstep    | First Blood       | Grants bounded critical chance against targets at full Life.                                                     |
-| Windstep    | Relentless Rhythm | Later hits in a multi-hit technique gain a small damage bonus.                                                   |
-| Windstep    | Lightfoot Steps   | Increases Speed and bounded critical chance; it has no mid-combat turn-order effect.                             |
+| Windstep      | First Blood       | Grants bounded critical chance against targets at full Life.                                                     |
+| Windstep      | Relentless Rhythm | Later hits in a multi-hit technique gain a small damage bonus.                                                   |
+| Windstep      | Lightfoot Steps   | Increases Speed and bounded critical chance; it has no mid-combat turn-order effect.                             |
 | Center/hybrid | Flowing Steel     | A limited portion of the lower of Physical Damage and Qi Damage contributes to techniques using the higher stat. |
 
 Inner Strength, Energy Field, and Lightfoot Steps therefore no longer exist as

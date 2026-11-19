@@ -107,8 +107,8 @@ Retain internal IDs `balanced`, `warrior`, `caster`, `shadow`, `mana`, `maxMana`
 | Internal / original     | Display name    |
 | ----------------------- | --------------- |
 | Balanced / Talentless   | Wanderer        |
-| Spell Caster (`caster`) | Cultivator        |
-| Shadow Ninja (`shadow`) | Windstep      |
+| Spell Caster (`caster`) | Cultivator      |
+| Shadow Ninja (`shadow`) | Windstep        |
 | Shuriken                | Flying Blades   |
 | Charge                  | Gather Qi       |
 | Energy Shot             | Qi Strike       |
@@ -187,8 +187,8 @@ approved. Classes appear left to right in this order:
 | Class      | Direction                                          | Accent            | Portrait action                                    |
 | ---------- | -------------------------------------------------- | ----------------- | -------------------------------------------------- |
 | Warrior    | Strength, resilience, decisive dao strikes         | Vermilion red     | Grounded diagonal sword lunge, side profile        |
-| Cultivator   | Inner cultivation and projected qi                 | Icy blue-white    | Turning palm strike, eyes following the projection |
-| Windstep | Lightness skill, opening speed, critical precision | Golden yellow     | Airborne sideways leap, looking toward the landing |
+| Cultivator | Inner cultivation and projected qi                 | Icy blue-white    | Turning palm strike, eyes following the projection |
+| Windstep   | Lightness skill, opening speed, critical precision | Golden yellow     | Airborne sideways leap, looking toward the landing |
 | Wanderer   | Generalist, self-taught and adaptable              | Jade / sage green | Low sweeping staff stance, face under a straw hat  |
 
 Wanderer flavor: “You were born with no specialty, but your potential is yours to
