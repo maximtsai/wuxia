@@ -32,10 +32,11 @@ const portraits: Record<
 export function classSelection(
   notice: string,
   selected: ClassId | null = null,
+  hasSave = false,
 ) {
   const art = selected ? portraits[selected] : null;
   const c = selected ? classes[selected] : null;
-  return `<div class="class-screen"><div class="class-heading"><h1>Choose your path</h1><button class="class-continue" data-command="load">Continue saved game ↗</button></div><div class="class-columns" role="group" aria-label="Choose a class">${(
+  return `<div class="class-screen"><div class="class-heading"><h1>Choose your path</h1>${hasSave ? '<button class="class-continue" data-command="load">Continue saved game ↗</button>' : ''}</div><div class="class-columns" role="group" aria-label="Choose a class">${(
     ['warrior', 'caster', 'shadow', 'balanced'] as ClassId[]
   )
     .map((id) => {

@@ -9,7 +9,7 @@ document.documentElement.classList.toggle(
 );
 document.documentElement.dataset.screenShake = String(preferences.screenShake);
 
-document.body.innerHTML = `<header><h1></h1><span>Playable prototype · Phase 3</span></header><main><div id="game" aria-label="Room and battlefield"></div><section id="interface" aria-label="Game controls"></section></main>`;
+document.body.innerHTML = `<main><div id="game" aria-label="Room and battlefield"></div><section id="interface" aria-label="Game controls"></section></main>`;
 let game: ReturnType<typeof createGame> | null = null;
 try {
   // Canvas labels must be drawn after local fonts load (CSS alone cannot
