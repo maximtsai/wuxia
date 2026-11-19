@@ -1,8 +1,44 @@
+@font-face {
+  font-family: 'Marcellus';
+  src: url('/fonts/Marcellus-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('/fonts/NotoSans-Variable.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
 :root {
   color-scheme: dark;
-  font-family: system-ui, sans-serif;
-  background: #111820;
-  color: #e1e8ee;
+  font-family: 'Noto Sans', system-ui, sans-serif;
+  /* Warm palette: lacquered wood, parchment text, gold trim, cinnabar for the
+     main action. Info surfaces are flat and recessed; controls are raised. */
+  --ink-0: #130e09;
+  --ink-1: #1e1710;
+  --ink-2: #2a2017;
+  --info-bg: #1b140ee6;
+  --info-line: #4d3c2a;
+  --text: #f3e7cb;
+  --text-muted: #cdbc98;
+  --text-faint: #a08e6e;
+  --gold: #e3bf6c;
+  --gold-bright: #ffe6a5;
+  --life: #c9604f;
+  --qi: #7fb6d6;
+  --jade: #93c79c;
+  --btn-top: #5a4329;
+  --btn-bottom: #3b2b1b;
+  --btn-edge: #c9a466;
+  --btn-text: #fff1d2;
+  --primary-top: #c8573b;
+  --primary-bottom: #93301f;
+  --primary-edge: #f1c47c;
+  background: var(--ink-0);
+  color: var(--text);
 }
 * {
   box-sizing: border-box;
@@ -20,16 +56,20 @@ header {
   gap: 12px;
 }
 h1 {
+  font-family: 'Marcellus', Georgia, serif;
+  font-weight: 400;
   font-size: 22px;
   margin: 0;
 }
 h2 {
+  font-family: 'Marcellus', Georgia, serif;
+  font-weight: 400;
   font-size: 20px;
   margin: 0 0 10px;
 }
 header span,
 .muted {
-  color: #aab8c5;
+  color: var(--text-muted);
   font-size: 14px;
 }
 main {
@@ -63,26 +103,79 @@ main {
   gap: 8px;
   margin: 12px 0;
 }
+/* Every control is a raised lacquer plate with a gold edge and a drop
+   shadow, so it never reads as an information panel. */
 button {
   font: inherit;
-  color: inherit;
-  background: #273746;
-  border: 1px solid #536779;
-  border-radius: 5px;
+  color: var(--btn-text);
+  background: linear-gradient(var(--btn-top), var(--btn-bottom));
+  border: 1px solid var(--btn-edge);
+  border-radius: 6px;
   padding: 10px 16px;
   min-height: 44px;
   cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 #ffffff26,
+    0 3px 0 #0b0704,
+    0 4px 10px #0007;
+  text-shadow: 0 1px 1px #0008;
+  transition:
+    background 0.12s,
+    box-shadow 0.12s,
+    border-color 0.12s;
 }
 button:hover:not(:disabled) {
-  background: #364d60;
+  background: linear-gradient(#73563a, #4a3622);
+  border-color: var(--gold-bright);
+  box-shadow:
+    inset 0 1px 0 #ffffff33,
+    0 3px 0 #0b0704,
+    0 0 14px #e3bf6c55;
+}
+button:active:not(:disabled) {
+  background: linear-gradient(#3b2b1b, #4a3622);
+  box-shadow:
+    inset 0 2px 4px #0009,
+    0 1px 0 #0b0704;
 }
 button:focus-visible {
-  outline: 3px solid #99c9c0;
+  outline: 3px solid var(--gold-bright);
   outline-offset: 3px;
 }
+/* Unavailable controls drop the plate entirely: flat, dashed, dim. */
 button:disabled {
-  opacity: 0.5;
-  cursor: default;
+  color: var(--text-faint);
+  background: transparent;
+  border: 1px dashed #6a5639;
+  box-shadow: none;
+  text-shadow: none;
+  cursor: not-allowed;
+}
+/* Main actions: enter a fight, buy, allocate, learn, confirm, retry. */
+button:is(
+    [data-command='fight'],
+    [data-command='buy'],
+    [data-command='buy-weapon'],
+    [data-command='learn'],
+    [data-command='tree-allocate'],
+    [data-command='respec-confirm'],
+    [data-command='delivery'],
+    [data-command='retry']
+  ):not(:disabled) {
+  background: linear-gradient(var(--primary-top), var(--primary-bottom));
+  border-color: var(--primary-edge);
+}
+button:is(
+    [data-command='fight'],
+    [data-command='buy'],
+    [data-command='buy-weapon'],
+    [data-command='learn'],
+    [data-command='tree-allocate'],
+    [data-command='respec-confirm'],
+    [data-command='delivery'],
+    [data-command='retry']
+  ):hover:not(:disabled) {
+  background: linear-gradient(#dd6948, #a8392a);
 }
 .action {
   text-align: left;
@@ -98,7 +191,7 @@ button:disabled {
   gap: 24px;
 }
 .panel {
-  border-top: 1px solid #3a4b5b;
+  border-top: 1px solid var(--info-line);
   padding-top: 14px;
 }
 ol {
@@ -108,7 +201,7 @@ ol {
 }
 #notice {
   min-height: 24px;
-  color: #b3dbcf;
+  color: var(--jade);
 }
 @media (max-width: 640px) {
   header {
@@ -152,11 +245,13 @@ main.overworld {
 .overworld .glass {
   pointer-events: auto;
 }
+/* Information surfaces: flat, recessed, no lift and no gold edge. */
 .glass {
-  background: #151d25ee;
-  border: 1px solid #53606a;
-  border-radius: 9px;
+  background: var(--info-bg);
+  border: 1px solid var(--info-line);
+  border-radius: 8px;
   padding: 12px;
+  box-shadow: 0 6px 24px #0006;
 }
 .player-hud {
   position: absolute;
@@ -173,8 +268,8 @@ main.overworld {
   place-items: center;
   width: 45px;
   height: 58px;
-  background: #34464b;
-  color: #a9d2c7;
+  background: #4b3a28;
+  color: var(--text);
   font-size: 28px;
   border-radius: 5px;
 }
@@ -198,17 +293,17 @@ main.overworld {
   height: 9px;
 }
 .resource meter::-webkit-meter-bar {
-  background: #333d46;
+  background: #0f0b07;
   border: none;
 }
 .life meter::-webkit-meter-optimum-value {
-  background: #8ec7a0;
+  background: var(--life);
 }
 .mana meter::-webkit-meter-optimum-value {
-  background: #80b9df;
+  background: var(--qi);
 }
 .energy meter::-webkit-meter-optimum-value {
-  background: #d7b877;
+  background: var(--gold);
 }
 .room-title {
   position: absolute;
@@ -230,7 +325,7 @@ main.overworld {
   padding: 6px 10px;
 }
 .world-tools .stats {
-  color: #ebcb7c;
+  color: var(--gold);
   padding: 0;
 }
 .gate-service {
@@ -242,7 +337,7 @@ main.overworld {
 }
 .gate-service small {
   display: block;
-  background: #151d25;
+  background: var(--ink-1);
   padding: 5px;
 }
 .healer-service {
@@ -250,18 +345,10 @@ main.overworld {
   left: 21%;
   top: 40%;
 }
-.save-service {
-  position: absolute;
-  right: 4%;
-  top: 44%;
-  display: grid;
-  gap: 5px;
-}
-.healer-service small,
-.save-service small {
+.healer-service small {
   display: block;
   margin-bottom: 5px;
-  color: #b6c2ca;
+  color: var(--text-muted);
 }
 .world-hint {
   position: absolute;
@@ -284,14 +371,14 @@ main.overworld {
 }
 .potions small {
   grid-column: 1 / -1;
-  color: #9facb7;
+  color: var(--text-faint);
 }
 .equipped-summary {
   position: absolute;
   bottom: 13%;
   right: 2%;
   font-size: 12px;
-  color: #aab8c5;
+  color: var(--text-muted);
 }
 .world-notice {
   position: absolute;
@@ -370,10 +457,20 @@ main.overworld {
 }
 .potion-offer {
   padding: 12px 0;
-  border-top: 1px solid #53606a;
+  border-top: 1px solid var(--info-line);
+}
+.potion-offer > strong {
+  color: var(--gold);
+}
+.potion-offer p {
+  color: var(--text-muted);
+  margin: 4px 0 8px;
+}
+.potion-offer small {
+  color: var(--text-faint);
 }
 .intent {
-  border-left: 3px solid #d7b877;
+  border-left: 3px solid var(--gold);
   padding-left: 12px;
 }
 @media (max-width: 760px) {
@@ -399,8 +496,10 @@ main.overworld {
   font-size: 12px;
 }
 .selected {
-  border-color: #99c9c0;
-  box-shadow: inset 0 0 0 1px #99c9c0;
+  border-color: var(--gold-bright);
+  box-shadow:
+    inset 0 0 0 1px var(--gold-bright),
+    0 0 16px #e3bf6c44;
 }
 .basic-actions {
   display: grid;
@@ -408,8 +507,8 @@ main.overworld {
   gap: 8px;
 }
 .action-preview {
-  background: #1c2a35;
-  border: 1px solid #526574;
+  background: var(--info-bg);
+  border: 1px solid var(--info-line);
   border-radius: 8px;
   padding: 14px;
 }
@@ -420,8 +519,15 @@ main.overworld {
 .target-card {
   flex: 1;
   padding: 12px;
-  border: 1px solid #526574;
+  background: var(--info-bg);
+  border: 1px solid var(--info-line);
   border-radius: 8px;
+}
+.target-card p {
+  color: var(--text-muted);
+}
+.target-card small {
+  color: var(--gold);
 }
 .gate-service {
   display: flex;
@@ -436,7 +542,7 @@ main.overworld {
 .class-choice {
   top: 16%;
   max-height: 76%;
-  background: #151d25;
+  background: var(--ink-1);
 }
 .world-modal small {
   display: block;
@@ -476,53 +582,49 @@ main.overworld {
   }
 }
 
-/* Phase 3 room services and explicit connected exits. */
-.room-services {
+/* Screen-reader-only text, e.g. the "Press E to interact" prompt. */
+.visually-hidden {
   position: absolute;
-  top: 38%;
-  left: 50%;
-  transform: translateX(-50%);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* Interaction card: opened with E / Space / Enter or the touch button. */
+.interact-card {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  max-width: 22%;
+  min-width: 180px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 6px;
+  text-align: center;
+}
+.interact-card p {
+  margin: 0;
+  font-size: 0.9em;
+  color: var(--text-muted);
+}
+.interact-card small {
+  color: var(--text-faint);
+}
+.interact-actions,
+.map-travel {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 6px;
-  max-width: 42%;
 }
-.room-exits {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+.map-travel {
+  justify-content: flex-start;
+  margin-bottom: 10px;
 }
-.room-exits > div {
-  position: absolute;
-  max-width: 24%;
-  pointer-events: auto;
-}
-.room-exits small {
-  display: block;
-  background: #151d25;
-  padding: 4px;
-}
-.exit-up {
-  top: 18%;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.exit-down {
-  bottom: 19%;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.exit-left {
-  top: 57%;
-  left: 1%;
-}
-.exit-right {
-  top: 57%;
-  right: 1%;
-}
+
 .world-modal {
   z-index: 5;
-  background: #151d25;
+  background: var(--ink-1);
 }
 .map-modal {
   width: 90%;
@@ -555,7 +657,7 @@ main.overworld {
   margin: 0;
 }
 .tree-head p {
-  color: #d7b877;
+  color: var(--gold);
 }
 .tree-head .controls {
   margin: 0 0 0 auto;
@@ -568,7 +670,7 @@ main.overworld {
   padding: 0;
   list-style: none;
   font-size: 12px;
-  color: #aab8c5;
+  color: var(--text-muted);
 }
 .tree-legend span {
   display: inline-block;
@@ -576,14 +678,14 @@ main.overworld {
   height: 10px;
   margin-right: 6px;
   border-radius: 50%;
-  border: 2px solid #99c9c0;
+  border: 2px solid var(--jade);
 }
 .tree-legend .allocated span {
-  background: #99c9c0;
+  background: var(--jade);
 }
 .tree-legend .available span {
-  box-shadow: 0 0 6px #d7b877;
-  border-color: #d7b877;
+  box-shadow: 0 0 6px var(--gold);
+  border-color: var(--gold);
 }
 .tree-legend .reachable span {
   opacity: 0.8;
@@ -602,8 +704,8 @@ main.overworld {
   display: grid;
   place-items: center;
   padding: 10px 10px 18px;
-  background: #10161d;
-  border: 1px solid #2f3c47;
+  background: radial-gradient(#231a11, #120d08 75%);
+  border: 1px solid var(--info-line);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -620,11 +722,11 @@ main.overworld {
   overflow: visible;
 }
 .tree-edge {
-  stroke: #3f4d59;
+  stroke: #4f3f2c;
   stroke-width: 3;
 }
 .tree-edge.active {
-  stroke: #d7b877;
+  stroke: var(--gold);
   stroke-width: 4;
 }
 .tree-node {
@@ -638,6 +740,7 @@ main.overworld {
   background: none;
   border: none;
   border-radius: 50%;
+  box-shadow: none;
   transform: translate(-50%, -50%);
 }
 .tree-node:hover:not(:disabled) {
@@ -648,14 +751,14 @@ main.overworld {
   height: 28px;
   border: 3px solid var(--region);
   border-radius: 50%;
-  background: color-mix(in srgb, var(--region) 20%, #151d25);
+  background: color-mix(in srgb, var(--region) 20%, var(--ink-1));
   transition: transform 0.12s;
 }
 .tree-node.kind-origin .tree-node-mark {
   width: 36px;
   height: 36px;
   box-shadow:
-    inset 0 0 0 3px #151d25,
+    inset 0 0 0 3px var(--ink-1),
     inset 0 0 0 6px var(--region);
 }
 .tree-node.kind-technique .tree-node-mark,
@@ -678,7 +781,7 @@ main.overworld {
   transform: translateX(-50%);
   font-size: 11px;
   line-height: 1.15;
-  color: #c4d0d9;
+  color: var(--text-muted);
   text-align: center;
   text-shadow: 0 1px 3px #000;
   pointer-events: none;
@@ -689,13 +792,13 @@ main.overworld {
 }
 .tree-node.kind-origin.allocated .tree-node-mark {
   box-shadow:
-    inset 0 0 0 3px #151d25,
+    inset 0 0 0 3px var(--ink-1),
     0 0 14px var(--region);
 }
 .tree-node.available .tree-node-mark {
   box-shadow:
-    0 0 0 3px #d7b87788,
-    0 0 16px #d7b87766;
+    0 0 0 3px #e3bf6c88,
+    0 0 16px #e3bf6c66;
 }
 .tree-node.available:hover .tree-node-mark {
   transform: scale(1.12);
@@ -741,7 +844,7 @@ main.overworld {
   line-height: 1.5;
 }
 .tree-owned {
-  color: #8ec7a0;
+  color: var(--jade);
   font-weight: 600;
 }
 .tree-hint {
@@ -778,9 +881,17 @@ main.overworld {
   gap: 10px;
 }
 .map-room {
-  border: 1px solid #536779;
+  background: #0f0b07aa;
+  border: 1px solid var(--info-line);
   border-radius: 4px;
   padding: 8px;
+  color: var(--text-muted);
+}
+.map-room strong {
+  color: var(--text);
+}
+.map-room.selected {
+  background: #3b2b1b;
 }
 .map-room[data-room='rift'] {
   grid-area: 1 / 1;
@@ -822,22 +933,14 @@ main.overworld {
   grid-area: 6 / 2;
 }
 @media (max-width: 760px) {
-  .room-services,
-  .room-exits {
+  .interact-card {
+    position: static;
+    transform: none;
+    max-width: none;
     grid-column: 1 / -1;
   }
-  .overworld .room-services {
-    max-width: none;
-  }
-  .room-exits {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .room-exits > div {
-    position: static;
-    max-width: none;
-    transform: none;
+  .interact-card small {
+    display: none; /* no E key on touch screens */
   }
   .overworld .map-modal {
     max-height: none;
@@ -853,10 +956,6 @@ main.overworld {
 }
 
 @media (min-width: 761px) {
-  .overworld .save-service {
-    top: 13%;
-    right: 1.5%;
-  }
   .map-room small {
     font-size: 11px;
     line-height: 1.2;
@@ -870,7 +969,8 @@ main.overworld {
 
 /* Opening screen: artwork is isolated from the replaceable world theme. */
 .choosing-class {
-  background: #10151d;
+  background: radial-gradient(ellipse at 50% 0%, #2b1f14, var(--ink-0) 70%);
+  min-height: 100svh;
 }
 .choosing-class > header,
 .choosing-class #game {
@@ -898,17 +998,17 @@ main.overworld {
   text-transform: uppercase;
   letter-spacing: 0.24em;
   font-size: 10px;
-  color: #a1a8b4;
+  color: var(--text-faint);
 }
 .class-heading h1 {
-  font-family: Georgia, serif;
+  font-family: 'Marcellus', Georgia, serif;
   font-size: clamp(28px, 4vw, 42px);
   font-weight: 400;
   letter-spacing: -0.02em;
   margin: 10px 0;
 }
 .class-heading p {
-  color: #9ba6b5;
+  color: var(--text-muted);
   margin: 0;
   font-size: 14px;
 }
@@ -921,9 +1021,9 @@ main.overworld {
   position: relative;
   height: clamp(310px, 52vh, 400px);
   min-width: 0;
-  border: 1px solid #39414e;
+  border: 1px solid var(--info-line);
   border-radius: 8px;
-  background: #181e28;
+  background: var(--ink-1);
   isolation: isolate;
   transition:
     border-color 0.2s,
@@ -943,7 +1043,7 @@ main.overworld {
   position: absolute;
   inset: 0;
   border-radius: 7px;
-  background: linear-gradient(transparent 30%, #10151d66 55%, #10151df5 88%);
+  background: linear-gradient(transparent 30%, #130e0966 55%, #130e09f5 88%);
   pointer-events: none;
 }
 .class-number {
@@ -952,29 +1052,27 @@ main.overworld {
   left: 14px;
   font-size: 10px;
   letter-spacing: 0.12em;
-  color: #ccd3dd;
+  color: var(--text);
 }
 .class-caption {
   position: absolute;
   inset: auto 14px 14px;
 }
 .class-caption h2 {
-  font-family: Georgia, serif;
+  font-family: 'Marcellus', Georgia, serif;
   font-weight: 400;
   font-size: 23px;
   margin: 0 0 4px;
 }
 .class-caption p {
   font-size: 11px;
-  color: #adb5c3;
+  color: var(--text-muted);
   margin: 0 0 14px;
 }
 .class-caption button {
   width: 100%;
   padding: 8px 6px;
   font-size: 12px;
-  background: #161d27e8;
-  border-color: #525b68;
 }
 .class-caption button span {
   float: right;
@@ -1004,7 +1102,7 @@ main.overworld {
   bottom: 125px;
   left: 12px;
   right: 12px;
-  background: #0e141df2;
+  background: var(--ink-1);
   border: 1px solid var(--class-accent);
   border-radius: 6px;
   padding: 12px;
@@ -1025,7 +1123,7 @@ main.overworld {
   margin: 6px 0 10px;
 }
 .class-tooltip small {
-  color: #acb8c8;
+  color: var(--text-faint);
   font-size: 10px;
 }
 .class-column:hover .class-tooltip,
@@ -1045,7 +1143,7 @@ main.overworld {
 .class-footer p {
   font-size: 11px;
   line-height: 1.6;
-  color: #96a1b1;
+  color: var(--text-faint);
   margin: 0;
 }
 .class-footer button {
@@ -1112,7 +1210,7 @@ main.overworld {
 
 /* Keep brushwork saturated enough to read; tooltips use an opaque paper-dark panel. */
 .class-tooltip {
-  background: #101720;
+  background: var(--ink-1);
 }
 @media (max-width: 600px) {
   .class-columns:has(.class-column:focus-within)
@@ -1129,4 +1227,829 @@ html.reduced-motion *::after {
   animation-duration: 0.001ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
+}
+
+/* Portrait selection: persistent color and a deliberate, separate start action. */
+.class-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  text-align: left;
+}
+.class-continue {
+  font-size: 13px;
+  white-space: nowrap;
+}
+button.class-column {
+  padding: 0;
+  text-align: left;
+  overflow: hidden;
+  color: #fff;
+  cursor: pointer;
+}
+.class-column > img {
+  filter: saturate(0.65) brightness(0.82);
+  object-fit: cover;
+  object-position: center;
+}
+.class-column[aria-pressed='true'] {
+  border-color: var(--class-accent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--class-accent) 25%, transparent);
+  transform: translateY(-5px);
+}
+.class-column[aria-pressed='true'] > img {
+  filter: saturate(1) brightness(1);
+}
+.class-column:focus-visible {
+  outline: 3px solid var(--class-accent);
+  outline-offset: 4px;
+}
+.class-shade {
+  background: linear-gradient(transparent 45%, #130e0988 70%, #130e09f5 100%);
+}
+.class-caption {
+  display: block;
+  bottom: 20px;
+}
+.class-name {
+  display: block;
+  font:
+    26px 'Marcellus',
+    Georgia,
+    serif;
+  margin-bottom: 8px;
+}
+.class-tagline {
+  display: block;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.class-check {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ink-0);
+  color: var(--class-accent);
+  text-align: center;
+  line-height: 26px;
+  opacity: 0;
+}
+.class-column[aria-pressed='true'] .class-check {
+  opacity: 1;
+}
+.class-decision {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  margin-top: 26px;
+  min-height: 94px;
+}
+.class-summary {
+  max-width: 620px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.class-summary > p {
+  margin: 0 0 8px;
+}
+.class-details {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.class-details summary {
+  cursor: pointer;
+  color: var(--class-accent);
+  width: fit-content;
+}
+.class-details p {
+  margin: 8px 0;
+}
+.class-begin {
+  flex-shrink: 0;
+  min-width: 185px;
+  background: linear-gradient(var(--primary-top), var(--primary-bottom));
+  border-color: var(--primary-edge);
+  padding: 15px 20px;
+  font-weight: 700;
+}
+.class-begin span {
+  margin-left: 20px;
+}
+.class-begin:disabled {
+  background: transparent;
+}
+.class-permanent {
+  font-size: 11px;
+  color: var(--text-faint);
+  margin: 10px 0 0;
+}
+@media (max-width: 600px) {
+  .class-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0;
+  }
+  .class-heading h1 {
+    margin-bottom: 0;
+  }
+  .class-continue {
+    padding-left: 0;
+  }
+  button.class-column {
+    height: 285px;
+  }
+  .class-name {
+    font-size: 22px;
+  }
+  .class-tagline {
+    font-size: 11px;
+  }
+  .class-decision {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .class-begin {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .class-heading {
+    animation: none;
+  }
+  @keyframes path-arrive {
+    from {
+      opacity: 0;
+      transform: translateY(7px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Warm, compact overworld HUD inspired by the market-room reference. */
+body.in-overworld > header {
+  display: none;
+}
+body.in-overworld {
+  background: var(--ink-0);
+}
+main.overworld {
+  width: min(100%, calc(100svh * 16 / 9));
+  max-width: 1920px;
+}
+/* Bottle slots are read-only status: a sunken well, not a raised plate. */
+.bottle-slot {
+  background: #110c08e6;
+  border: 1px solid var(--info-line);
+  border-radius: 6px;
+  color: var(--text);
+  box-shadow: inset 0 2px 8px #000b;
+  cursor: help;
+}
+.bottle-slot:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 3px;
+}
+.overworld .player-hud {
+  width: 24%;
+  max-width: 360px;
+  padding: 10px;
+  gap: 10px;
+}
+.player-resources > strong {
+  font-family: 'Marcellus', serif;
+  font-size: clamp(14px, 1.45vw, 21px);
+  font-weight: 400;
+}
+.overworld .resource {
+  grid-template-columns: 30px 1fr 70px;
+  align-items: center;
+  margin: 6px 0;
+  font-size: 11px;
+}
+.overworld .resource strong {
+  grid-column: 3;
+  grid-row: 1;
+  font-weight: 400;
+}
+.overworld .resource meter {
+  grid-column: 2;
+  grid-row: 1;
+  height: 12px;
+}
+.overworld .life meter::-webkit-meter-optimum-value {
+  background: #c36355;
+}
+.overworld .life meter::-moz-meter-bar {
+  background: #c36355;
+}
+.overworld .mana meter::-moz-meter-bar {
+  background: #80b9df;
+}
+.training-energy {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+.overworld .room-title {
+  top: 2%;
+  background: #1b140ecc;
+  border-color: transparent transparent var(--gold);
+  border-width: 0 0 1px;
+  box-shadow: none;
+  border-radius: 0;
+  text-transform: none;
+  letter-spacing: 0.03em;
+  font-size: clamp(16px, 1.8vw, 26px);
+  padding: 6px 28px;
+}
+.overworld .world-tools {
+  border: 0;
+  background: #1b140eb0;
+}
+.gold-counter {
+  font-family: 'Marcellus', serif;
+  color: var(--gold);
+  font-size: clamp(16px, 1.8vw, 24px);
+}
+.overworld .world-tools button {
+  padding: 8px 12px;
+}
+.overworld .world-hint {
+  padding: 0;
+  border: 0;
+  background: none;
+  display: flex;
+  gap: 8px;
+  box-shadow: none;
+}
+.overworld .world-hint button,
+.overworld .world-dock button {
+  padding: 12px 16px;
+  font-family: 'Marcellus', serif;
+  font-size: 14px;
+}
+.world-hint button::after,
+.world-dock button::after {
+  font:
+    10px 'Noto Sans',
+    sans-serif;
+  margin-left: 12px;
+  border: 1px solid #d9bd85;
+  border-radius: 3px;
+  padding: 1px 4px;
+  color: #f5dfae;
+  background: #0006;
+}
+button[data-command='map']::after {
+  content: 'M';
+}
+button[data-command='journal']::after {
+  content: 'J';
+}
+.world-dock button[data-command='progression']::after {
+  content: 'C';
+}
+.world-dock button[data-command='equipment']::after {
+  content: 'I';
+}
+.world-dock button[data-command='skills']::after {
+  content: 'K';
+}
+.overworld .world-dock {
+  gap: 8px;
+}
+.skill-dock {
+  position: relative;
+}
+.skill-badge {
+  position: absolute;
+  right: -5px;
+  top: -9px;
+  border-radius: 50%;
+  background: #a84439;
+  color: #fff4d8;
+  font-size: 11px;
+  padding: 2px 6px;
+}
+.overworld .bottle-dock {
+  position: absolute;
+  bottom: 1.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 9px;
+  pointer-events: auto;
+}
+.bottle-slot {
+  position: relative;
+  width: 74px;
+  min-height: 94px;
+  padding: 10px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.bottle-number {
+  position: absolute;
+  top: 5px;
+  left: 7px;
+  font-size: 10px;
+  color: var(--text-faint);
+}
+.bottle-icon {
+  display: block;
+  width: 23px;
+  height: 28px;
+  border: 2px solid #e2d4b1;
+  border-radius: 40% 40% 46% 46%;
+  background: var(--bottle-color);
+  margin-top: 8px;
+  position: relative;
+  box-shadow: inset 4px 0 #ffffff30;
+}
+.bottle-icon::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: -9px;
+  height: 8px;
+  width: 7px;
+  background: #d9d8c6;
+  border-top: 3px solid #7b5b38;
+}
+.bottle-slot strong {
+  font-size: 12px;
+  font-weight: 400;
+}
+.charge-pips {
+  display: flex;
+  gap: 4px;
+}
+.charge-pips i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #514b40;
+}
+.charge-pips i.filled {
+  background: var(--bottle-color);
+}
+.bottle-slot.depleted .bottle-icon {
+  background: #4c4942;
+}
+.overworld .equipped-summary {
+  display: none;
+}
+.overworld .world-notice {
+  bottom: calc(1.5% + 104px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1b140edf;
+  color: var(--text);
+  padding: 5px 12px;
+  border-radius: 3px;
+  max-width: 65%;
+  text-align: center;
+  font-size: 11px;
+  pointer-events: none;
+}
+.world-notice:empty {
+  display: none;
+}
+.overworld .world-modal {
+  top: 18%;
+  max-height: 67%;
+}
+.overworld .context-prompt {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  font-size: 12px;
+  padding: 7px 12px;
+  white-space: nowrap;
+}
+.context-prompt kbd {
+  background: var(--gold-bright);
+  color: #261e12;
+  padding: 1px 5px;
+  margin-right: 8px;
+  border-radius: 2px;
+}
+.stick-portrait {
+  width: 46px;
+  height: 74px;
+  background: #645846;
+  position: relative;
+  overflow: hidden;
+}
+.stick-portrait::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  background: #141619;
+  border-radius: 50%;
+  position: absolute;
+  top: 8px;
+  left: 11px;
+}
+.stick-portrait::after {
+  content: '';
+  width: 27px;
+  height: 4px;
+  background: #c36355;
+  position: absolute;
+  top: 17px;
+  left: 9px;
+  transform: rotate(-8deg);
+}
+.stick-portrait span {
+  width: 9px;
+  height: 36px;
+  background: #141619;
+  position: absolute;
+  top: 30px;
+  left: 19px;
+  transform: rotate(-8deg);
+  box-shadow:
+    10px 10px 0 -2px #141619,
+    -9px 9px 0 -2px #141619;
+}
+@media (max-width: 1000px) and (min-width: 761px) {
+  .overworld .world-dock button,
+  .overworld .world-hint button {
+    padding: 9px;
+    font-size: 12px;
+  }
+  .world-dock button::after,
+  .world-hint button::after {
+    display: none;
+  }
+  .overworld .player-hud {
+    width: 30%;
+  }
+  .portrait {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .overworld #interface {
+    background: var(--ink-1);
+  }
+  .overworld .player-hud {
+    max-width: none;
+    width: auto;
+  }
+  .overworld .bottle-dock {
+    position: static;
+    transform: none;
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+  .overworld .world-notice {
+    position: static;
+    transform: none;
+    max-width: none;
+  }
+  .overworld .context-prompt {
+    position: static;
+    transform: none;
+    grid-column: 1 / -1;
+  }
+  .overworld .world-dock {
+    justify-content: center;
+  }
+  .world-dock button::after,
+  .world-hint button::after {
+    display: none;
+  }
+  .overworld .world-dock button {
+    padding: 12px;
+  }
+}
+
+/* Combat read-outs sit in a recessed strip; the log toggle reads as a control. */
+#interface > .stats {
+  background: var(--info-bg);
+  border: 1px solid var(--info-line);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text-muted);
+}
+details > summary {
+  cursor: pointer;
+  color: var(--gold);
+  width: fit-content;
+}
+details > summary:hover {
+  color: var(--gold-bright);
+}
+.combat-log {
+  color: var(--text-muted);
+}
+
+/* Economy: the page header is never needed; the game names its own rooms. */
+body > header {
+  display: none;
+}
+/* Options: everything not needed right now lives behind one top-right button. */
+.options {
+  position: relative;
+}
+.options-toggle {
+  min-width: 44px;
+  padding: 8px 14px;
+  white-space: nowrap;
+}
+.options-toggle span {
+  font-size: 16px;
+  margin-right: 4px;
+}
+.options-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 10;
+  display: grid;
+  gap: 6px;
+  min-width: 190px;
+  padding: 8px;
+}
+.options-menu button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
+  min-height: 40px;
+  padding: 8px 12px;
+}
+.options-menu kbd,
+.options-menu button::after {
+  font:
+    10px 'Noto Sans',
+    sans-serif;
+  border: 1px solid #d9bd85;
+  border-radius: 3px;
+  padding: 1px 4px;
+  color: #f5dfae;
+  background: #0006;
+}
+.options-menu button::after {
+  content: none;
+}
+/* Combat: title and options on one row, then only what this turn needs. */
+.combat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+.combat-head h2 {
+  margin: 0;
+}
+.combat-stats {
+  margin: 10px 0;
+}
+.last-log {
+  color: var(--text-muted);
+  font-style: italic;
+  min-height: 1.5em;
+  margin: 8px 0;
+}
+.target-button {
+  flex: 1;
+  display: grid;
+  gap: 2px;
+  text-align: left;
+}
+.target-button[aria-pressed='true'] {
+  border-color: var(--gold-bright);
+  box-shadow:
+    inset 0 0 0 1px var(--gold-bright),
+    0 3px 0 #0b0704,
+    0 0 16px #e3bf6c55;
+}
+.interact-card {
+  position: absolute;
+}
+.card-close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-height: 0;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  line-height: 1;
+  font-size: 16px;
+}
+@media (max-width: 760px) {
+  .interact-card {
+    position: relative;
+  }
+}
+/* Thin, always-on EXP progress under the name line. */
+.xp-bar {
+  display: block;
+  width: 100%;
+  height: 4px;
+  margin: 4px 0 2px;
+}
+.xp-bar::-webkit-meter-bar {
+  background: #0f0b07;
+  border: none;
+  border-radius: 2px;
+}
+.xp-bar::-webkit-meter-optimum-value {
+  background: var(--gold);
+  border-radius: 2px;
+}
+.xp-bar::-moz-meter-bar {
+  background: var(--gold);
+}
+.turn-order {
+  color: var(--text-muted);
+  margin: 6px 0;
+}
+.turn-order strong {
+  color: var(--gold-bright);
+}
+
+/* Combat on one screen: the battlefield takes whatever height the panel leaves. */
+body.in-combat main {
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+body.in-combat #game {
+  flex: 1 1 0;
+  min-height: 160px;
+  max-height: none;
+  aspect-ratio: auto;
+}
+body.in-combat #interface {
+  flex: 0 0 auto;
+  max-height: 64svh;
+  overflow-y: auto;
+  padding-top: 4px;
+}
+body.in-combat .combat-head {
+  margin-top: 4px;
+}
+body.in-combat .combat-stats {
+  margin: 6px 0;
+  padding: 6px 12px;
+}
+body.in-combat .skill-grid {
+  margin: 8px 0;
+}
+.last-log {
+  display: flex;
+  align-items: flex-end;
+  height: 1.5em;
+  min-height: 0;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+.last-log > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.last-log.showing-detail {
+  overflow: visible;
+  white-space: normal;
+  color: var(--text);
+  font-style: normal;
+}
+.last-log.showing-detail > span {
+  background: var(--ink-1);
+  border: 1px solid var(--info-line);
+  border-radius: 6px;
+  padding: 4px 8px;
+  box-shadow: 0 -4px 16px #0008;
+}
+.fight-summary strong {
+  color: var(--gold);
+  font-size: 1.1em;
+}
+.stat-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.stat-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  color: var(--text-muted);
+}
+
+/* Key caps are for keyboards; touch screens get tap cues instead. */
+@media (hover: none) and (pointer: coarse) {
+  .kbd-only,
+  .world-dock button::after {
+    display: none !important;
+  }
+}
+@media (hover: hover), (pointer: fine) {
+  .touch-only {
+    display: none !important;
+  }
+}
+kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6em;
+  height: 1.6em;
+  padding: 0 4px;
+  font:
+    600 0.75em 'Noto Sans',
+    sans-serif;
+  color: #261e12;
+  background: linear-gradient(var(--gold-bright), #d9bd85);
+  border-radius: 4px;
+  box-shadow: 0 2px 0 #7b5b38;
+}
+/* First-steps hint: WASD, arrows and a click, or a tap on touch. */
+.overworld .walk-hint {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.walk-hint-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.key-cluster {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+}
+.key-cluster > span {
+  display: flex;
+  gap: 3px;
+}
+.hint-or,
+.hint-label {
+  color: var(--text-muted);
+  font-size: 0.85em;
+}
+.hint-icon {
+  width: 22px;
+  height: 30px;
+  color: var(--gold-bright);
+}
+.touch-only .hint-icon {
+  width: 30px;
+  height: 30px;
+}
+/* Skill hotkey badge in the button's corner. */
+.skill-button {
+  position: relative;
+}
+.skill-button .hotkey {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 0.7em;
+}
+@media (max-width: 760px) {
+  .overworld .walk-hint {
+    position: static;
+    transform: none;
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+}
+.walk-hint kbd {
+  min-width: 24px;
+  height: 24px;
+  font-size: 14px;
+  font-family: system-ui, sans-serif;
+}
+.skill-button:has(.hotkey) {
+  padding-right: 30px;
 }

@@ -11,7 +11,7 @@ export function createGame(): Phaser.Game {
     parent: 'game',
     width: LOGICAL_WIDTH,
     height: LOGICAL_HEIGHT,
-    backgroundColor: '#000000',
+    backgroundColor: '#130e09',
     scene: [
       new URLSearchParams(location.search).has('rigPreview')
         ? RigPreviewScene

@@ -23,8 +23,8 @@ them as compatibility requirements.
 | ---------- | ----------------------------------------------------------------------------------------------- | -------------- | --------------- |
 | Wanderer   | Generalist with no outstanding weakness                                                         | Flying Blades  | Iron Knife      |
 | Warrior    | Strength- and Life-focused melee fighter; slower and weak in qi                                 | Stab           | Iron Knife      |
-| Cultivator   | Qi-focused class with high Qi; relies on projected techniques, healing, Gather Qi, and Qi Burst | Gather Qi      | Energy Knife    |
-| Windstep | Speed- and evasion-focused class with weaker physical power                                     | Shadow Blend   | Iron Knife      |
+| Cultivator | Qi-focused class with high Qi; relies on projected techniques, healing, Gather Qi, and Qi Burst | Gather Qi      | Energy Knife    |
+| Windstep   | Speed- and evasion-focused class with weaker physical power                                     | Shadow Blend   | Iron Knife      |
 
 Starting stats and class-specific level-up boosts:
 
@@ -32,8 +32,8 @@ Starting stats and class-specific level-up boosts:
 | ---------- | -------: | ------: | -------: | -------: | --------------: | --------: | ---------------: | ---------: |
 | Wanderer   |  15 (+2) | 15 (+2) | 75 (+10) | 75 (+10) |           3 (8) |         2 |                3 |          2 |
 | Warrior    |  17 (+3) | 13 (+1) | 85 (+15) |  65 (+5) |          5 (10) |         0 |                5 |          0 |
-| Cultivator   |  15 (+1) | 13 (+2) | 75 (+10) | 90 (+15) |               0 |    5 (10) |                0 |          5 |
-| Windstep |  13 (+1) | 17 (+3) | 70 (+10) | 80 (+10) |           3 (8) |         3 |                2 |          2 |
+| Cultivator |  15 (+1) | 13 (+2) | 75 (+10) | 90 (+15) |               0 |    5 (10) |                0 |          5 |
+| Windstep   |  13 (+1) | 17 (+3) | 70 (+10) | 80 (+10) |           3 (8) |         3 |                2 |          2 |
 
 All classes start with 50 Max Energy. Parenthesized values in stat columns are the
 class-specific increase when that stat is chosen at level-up. Damage values shown as
@@ -114,19 +114,19 @@ rank scaling of Shadow Strike and Annihilate. Do not reproduce them silently.
 
 ### Support active skills
 
-| Successor name (original) | Unlock and cost                                           | Original detailed effect                                                                                                                                                                                                                     |
-| ------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Successor name (original) | Unlock and cost                                             | Original detailed effect                                                                                                                                                                                                                     |
+| ------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Gather Qi (Charge)        | Energy Shot learned; no cost documented; Cultivator starter | Self; consumes the turn; restores `25×rCharge` Qi, capped at Max Qi. Rank 10 restores 250.                                                                                                                                                   |
-| Heal                      | Level 5 + Charge; 15 Qi                                   | Self; consumes the turn; restores `Max Life×(0.13+0.12×rHeal)`, capped at Max Life. The raw formula exceeds 100% at rank 8.                                                                                                                  |
-| Shadow Replicate          | Level 15 + Shadow Strike; 100 Qi                          | Summons a shadow ally with Max Life `70+30×r`, Physical Damage `13+12×r`, Magical/Qi Damage `13+12×r`, and Speed `Sinjid Speed+4×r`. Defence, duration, repeat-cast, replacement, and exact attack behavior are not specified by the source. |
+| Heal                      | Level 5 + Charge; 15 Qi                                     | Self; consumes the turn; restores `Max Life×(0.13+0.12×rHeal)`, capped at Max Life. The raw formula exceeds 100% at rank 8.                                                                                                                  |
+| Shadow Replicate          | Level 15 + Shadow Strike; 100 Qi                            | Summons a shadow ally with Max Life `70+30×r`, Physical Damage `13+12×r`, Magical/Qi Damage `13+12×r`, and Speed `Sinjid Speed+4×r`. Defence, duration, repeat-cast, replacement, and exact attack behavior are not specified by the source. |
 
 ### Passive skills
 
-| Successor name (original)      | Unlock                                     | Original detailed effect                                                                                                                                                                                                             |
-| ------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Successor name (original)      | Unlock                                   | Original detailed effect                                                                                                                                                                                                             |
+| ------------------------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Lightfoot Steps (Shadow Blend) | Level 1 + Speed Strike; Windstep starter | At battle start, adds `2×rShadowBlend` Speed. No separate critical bonus is documented.                                                                                                                                              |
-| Energy Field                   | Level 1 + Energy Shot                      | Adds `7×rEnergyField` to Shuriken, Energy Shot, Blast Fire, Shadow Strike, and Annihilate formulas. It does not affect Mana Bomb. Because of the channel bug, the documented magical passive ultimately raises physical-type damage. |
-| Inner Strength                 | Level 5 + Vertical Strike                  | Adds `5×rInnerStrength` to Attack, Stab, Double Strike, Speed Strike, Vertical Strike, Avenger, Split, and Execution formulas. Because of the channel bug, the documented physical passive ultimately raises qi/magical-type damage. |
+| Energy Field                   | Level 1 + Energy Shot                    | Adds `7×rEnergyField` to Shuriken, Energy Shot, Blast Fire, Shadow Strike, and Annihilate formulas. It does not affect Mana Bomb. Because of the channel bug, the documented magical passive ultimately raises physical-type damage. |
+| Inner Strength                 | Level 5 + Vertical Strike                | Adds `5×rInnerStrength` to Attack, Stab, Double Strike, Speed Strike, Vertical Strike, Avenger, Split, and Execution formulas. Because of the channel bug, the documented physical passive ultimately raises qi/magical-type damage. |
 
 Only one class starter is learned at game start. Charge and Shadow Blend are starter
 exceptions despite their ordinary prerequisites.
@@ -164,6 +164,80 @@ unlocks the Dark Rift and ending.
 - The player can end training at any time; zero Energy ends it.
 - A training level-up restores Energy.
 - The ward fights back.
+
+### Human Gateway opponents
+
+Eleven enemy types fill the twenty levels; each returns later with higher stats
+and more skills, and a paired level fights both at once. Figures are per
+appearance, from the fan wiki's
+[enemy pages](https://sinjid.fandom.com/wiki/Enemies_-_Sinjid_Shadow_of_the_Warrior)
+(read September 2026). Like the skill formulas they are community research, not
+an extracted data table.
+
+| Level | Opponent(s)           | Drops                     |
+| ----: | --------------------- | ------------------------- |
+|     1 | Thief                 | —                         |
+|     2 | Bandit                | —                         |
+|     3 | Raider                | Raider Sword              |
+|     4 | Thief + Bandit        | —                         |
+|     5 | Warrior               | Long Sword, Wooden Shield |
+|     6 | Seer                  | —                         |
+|     7 | Raider + Warrior      | —                         |
+|     8 | Mercenary             | —                         |
+|     9 | Assailant             | —                         |
+|    10 | Warrior + Seer        | —                         |
+|    11 | Mercenary + Assailant | Double Razor              |
+|    12 | Agent                 | —                         |
+|    13 | Seer                  | —                         |
+|    14 | Shaman                | Wooden Staff              |
+|    15 | Assailant             | —                         |
+|    16 | Ronin                 | —                         |
+|    17 | Agent                 | —                         |
+|    18 | Samurai               | —                         |
+|    19 | Shaman + Ronin        | —                         |
+|    20 | Samurai + Samurai     | —                         |
+
+Stats per appearance. P and Q are physical and qi (magic); Sh columns belong to
+the enemy's shield: `Sh dmg` is its shield damage and `Sh P def` / `Sh Q def` the
+shield's defenses. `—` means the enemy carries no shield; `?` means the wiki
+leaves the value blank.
+
+|  Lv | Enemy     | Life | Shield HP | P dmg | Q dmg | Sh dmg | P def | Q def | Sh P def | Sh Q def | Spd | EXP | Gold | Weapon       | Shield        | Skills                                                                                       |
+| --: | --------- | ---: | --------: | ----: | ----: | -----: | ----: | ----: | -------: | -------: | --: | --: | ---: | ------------ | ------------- | -------------------------------------------------------------------------------------------- |
+|   1 | Thief     |   60 |        20 |     5 |     0 |      5 |    10 |    15 |        0 |       20 |  15 |  30 |   30 | Iron Knife   | Leather Wrist | Attack                                                                                       |
+|   2 | Bandit    |   40 |        60 |     7 |     0 |      5 |    10 |    15 |        0 |       20 |  15 |  30 |   40 | Iron Knife   | Metal Wrist   | Attack, Stab                                                                                 |
+|   3 | Raider    |  120 |        15 |     9 |     0 |      5 |    10 |    15 |        0 |       20 |  15 |  40 |   50 | Raider Sword | Metal Wrist   | Attack, Precision Slash                                                                      |
+|   4 | Thief     |  140 |        35 |     7 |     0 |      5 |    10 |    15 |        0 |       20 |  15 |  30 |   50 | Iron Knife   | Leather Wrist | Attack                                                                                       |
+|   4 | Bandit    |  100 |        35 |     4 |     0 |      5 |    10 |    15 |        0 |       20 |  15 |  30 |   50 | Iron Knife   | Leather Wrist | Attack, Stab                                                                                 |
+|   5 | Warrior   |  180 |       200 |     8 |     0 |     10 |    10 |    15 |        0 |       20 |  15 |  40 |   60 | Long Sword   | Wooden Shield | Attack, Stab, Precision Slash                                                                |
+|   6 | Seer      |  200 |       170 |     2 |     8 |     10 |    30 |    10 |       60 |       15 |  17 |  40 |   70 | Wooden Rod   | Wooden Guard  | Attack, Fireball, Enemy Heal                                                                 |
+|   7 | Raider    |  200 |        70 |     5 |     0 |     10 |    10 |    15 |        0 |       20 |  15 |  40 |   50 | Raider Sword | Metal Wrist   | Attack, Precision Slash                                                                      |
+|   7 | Warrior   |  230 |       140 |     3 |     0 |      5 |    10 |    15 |        0 |       20 |  15 |  40 |   65 | Long Sword   | Wooden Shield | Attack, Stab, Precision Slash                                                                |
+|   8 | Mercenary |  400 |       150 |    12 |     0 |     10 |    20 |    20 |       70 |       70 |  14 |  60 |   80 | Long Sword   | Metal Guard   | Attack, Stab, Fireball, Precision Slash, Enemy Heal                                          |
+|   9 | Assailant |  100 |        40 |    14 |     0 |     10 |     5 |    30 |       15 |       15 |  50 |  60 |   90 | Katana       | Hand Blade    | Attack, Precision Slash                                                                      |
+|  10 | Warrior   |  280 |       320 |     6 |     0 |     10 |    10 |    30 |        0 |       30 |  14 |  50 |  110 | Long Sword   | Metal Shield  | Attack, Stab, Precision Slash                                                                |
+|  10 | Seer      |  260 |       100 |     3 |     7 |     10 |    40 |    10 |       30 |        0 |  17 |  50 |  110 | Wooden Rod   | Metal Guard   | Attack, Fireball, Enemy Heal                                                                 |
+|  11 | Mercenary |  420 |       170 |    10 |     0 |     15 |     0 |    30 |        0 |       30 |  10 |  75 |  130 | Double Razor | Metal Guard   | Attack, Stab, Fireball, Precision Slash, Enemy Heal                                          |
+|  11 | Assailant |  110 |        80 |    13 |     0 |     15 |    10 |    25 |       10 |       25 |  50 |  75 |  130 | Katana       | Metal Guard   | Attack, Precision Slash                                                                      |
+|  12 | Agent     |  550 |       250 |    17 |     0 |     15 |   -15 |    40 |       25 |       50 |  19 | 150 |  160 | Katana       | Metal Wrist   | Attack, Stab, Fireball, Precision Slash, Lightning Blast, Shockwave, Enemy Heal              |
+|  13 | Seer      |  600 |       250 |     4 |    15 |     15 |    60 |    15 |       60 |       30 |  19 | 150 |  120 | Golden Rod   | Metal Guard   | Attack, Stab, Fireball, Enemy Heal                                                           |
+|  14 | Shaman    |  700 |         — |     7 |    14 |      7 |    40 |    40 |        — |        — |  19 |   ? |   70 | Wooden Staff | —             | Attack, Fireball, Precision Slash, Enemy Heal                                                |
+|  15 | Assailant |  180 |        70 |    23 |     0 |     20 |    15 |    40 |       15 |       40 |  60 | 120 |  120 | Katana       | Double Blade  | Attack, Precision Slash                                                                      |
+|  16 | Ronin     |  900 |         — |    10 |    13 |     20 |    40 |    40 |        — |        — |  19 |   ? |  120 | Katana       | —             | Attack, Stab, Precision Slash, Flame Hoop, Energy Stab, Enemy Heal                           |
+|  17 | Agent     | 1000 |       120 |    19 |     0 |     10 |   -10 |    40 |       90 |       90 |  21 | 120 |  140 | Silver Knife | Double Blade  | Attack, Stab, Fireball, Precision Slash, Lightning Blast, Shockwave, Energy Stab, Enemy Heal |
+|  18 | Samurai   | 1100 |       150 |    18 |     0 |     10 |    40 |    30 |       40 |       30 |  18 | 160 |  230 | Katana       | Metal Guard   | Attack, Stab, Precision Slash, Flame Hoop, Energy Stab, Enemy Heal                           |
+|  19 | Shaman    | 1000 |         — |     9 |     8 |      8 |    20 |    50 |        — |        — |  20 |   ? |  160 | Wooden Rod   | —             | Attack, Fireball, Shock Blast, Enemy Heal                                                    |
+|  19 | Ronin     | 1000 |         — |    10 |    11 |     10 |    40 |    40 |        — |        — |  20 |   ? |  160 | Katana       | —             | Attack, Stab, Precision Slash, Flame Hoop, Energy Stab, Enemy Heal                           |
+|  20 | Samurai   | 1350 |       150 |    14 |    10 |     10 |    40 |    30 |       40 |       30 |  17 | 275 |  325 | Katana       | Metal Guard   | Attack, Stab, Precision Slash, Flame Hoop                                                    |
+|  20 | Samurai   | 1350 |       150 |    10 |    14 |     10 |    40 |    30 |       40 |       30 |  17 | 275 |  325 | Long Sword   | Double Blade  | Attack, Stab, Precision Slash, Flame Hoop                                                    |
+
+- Speed decides turn order (see [Turn order and accuracy](#turn-order-and-accuracy)), so the Assailant's 50–60 all but
+  guarantees it acts first on levels 9, 11 and 15.
+- The wiki records negative physical defense for both Agents (-15, -10); kept
+  as recorded.
+- EXP is blank for every Shaman and Ronin appearance.
+- Healers (Seer, Mercenary, Shaman, Ronin, Agent, Samurai at 18) carry Enemy
+  Heal; pairs on levels 10, 11 and 19 put a healer beside a damage dealer.
 
 ## Energy
 

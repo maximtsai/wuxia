@@ -16,9 +16,10 @@ game tabs reload with the change. See
 [Content editor](docs/technical-design.md#content-editor).
 
 Choose a class and travel up to Potions & Food, then left to Human Gateway.
-Open **Encounters / Training** at a portal or in the Training Room. **Skills** (in the
-bottom-right dock) opens the shared skill tree, where connected nodes and technique
-ranks spend the same Skill Points; **Progression** offers stat choices and respec previews. Select an
+Open **Encounters / Training** at a portal or in the Training Room. **Skill Tree** (shown
+bottom right while points are unspent, otherwise in the ☰ options menu) opens the
+shared skill tree, where connected nodes and technique
+ranks spend the same Skill Points; **Character** offers stat choices (and respec previews at the Mentor upstairs). Select an
 action and target, then confirm. All 16 active skills stay visible as temporary
 prototype content; prerequisites determine availability. Basic Attack restores 10
 Qi after resolving. Tab/Enter activates controls, keys 1–9 select skills, and

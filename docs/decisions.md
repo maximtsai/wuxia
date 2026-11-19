@@ -67,8 +67,8 @@ visuals stay geometric and theme-independent. Connected rooms remain Phase 3.
 - Generate 20/10/5 sequential portal stages from typed archetypes and balance data.
 - Keep manual saves in every room, with explicit v4 migration and no campaign
   unlocks inferred from old prototype wins.
-- Room service buttons approach their landmark; exits transition immediately and
-  cost no Energy. Respec is located upstairs; allocation is available everywhere.
+- Room objects show UI only up close (proximity card); exits are doorway signs
+  plus map travel, transition immediately and cost no Energy. Respec is located upstairs; allocation is available everywhere.
 - Keep free recovery and well access, fixed weapon stock, and a 35-gold delivery
   fallback. Broader armor/shield content remains a future extension.
 

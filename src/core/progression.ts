@@ -154,11 +154,15 @@ export function selectClass(p: Player, id: ClassId) {
   p.mana = Math.min(p.maxMana, Math.round(mana * p.maxMana));
   return true;
 }
+/** EXP needed to leave `level`; at the level cap EXP stays capped at the last span. */
+export function xpToNext(level: number) {
+  return 50 * Math.min(level, 99);
+}
 export function addExperience(p: Player, amount: number) {
   p.xp += amount;
   let levels = 0;
-  while (p.level < 99 && p.xp >= 50 * p.level) {
-    p.xp -= 50 * p.level;
+  while (p.level < 99 && p.xp >= xpToNext(p.level)) {
+    p.xp -= xpToNext(p.level);
     p.level++;
     levels++;
   }
@@ -180,7 +184,7 @@ export function respecPreview(p: Player) {
   } as Player;
   syncStats(preview);
   return {
-    price: p.level * 2,
+    price: p.level,
     strength: preview.strength,
     speed: preview.speed,
     maxLife: preview.maxLife,

@@ -28,8 +28,7 @@ vi.mock('../../src/content/data/tree.json', async (importOriginal) => {
   return { default: tree };
 });
 
-const basePower = (detail: string) =>
-  Number(/Base power (\d+)/.exec(detail)?.[1]);
+const basePower = (detail: string) => Number(/Power (\d+)/.exec(detail)?.[1]);
 
 describe('tree effects in combat', () => {
   it('grant usable skills, change costs, and add power through session code', () => {

@@ -51,6 +51,9 @@ export function campaignReason(s: Session, id: string) {
     return 'Complete the Human Gateway first';
   if (stage.stage > s.world.cleared[stage.portal] + 1)
     return 'Clear the previous stage first';
+  // Human Gateway rewards settle exactly once; Monster Portal and Dark Rift replay.
+  if (stage.portal === 'human' && stage.stage <= s.world.cleared.human)
+    return 'Cleared · Human Gateway stages cannot be replayed';
   return null;
 }
 export function completeStage(s: Session, id: string) {

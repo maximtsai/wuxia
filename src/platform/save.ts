@@ -1,4 +1,10 @@
-import { rooms, portals, newWorld, type WorldState } from '../content/world';
+import {
+  MONK_RESTORES,
+  rooms,
+  portals,
+  newWorld,
+  type WorldState,
+} from '../content/world';
 import {
   newSession,
   copyPlayer,
@@ -298,6 +304,12 @@ export function decodeSave(raw: string): Session {
     world.delivery = w.delivery;
     world.deliveries = w.deliveries;
     world.endingSeen = w.endingSeen;
+    // Saves from before the monk simply have every restore left.
+    if (w.restoresUsed !== undefined) {
+      if (!integer(w.restoresUsed, MONK_RESTORES))
+        throw new Error('Invalid restores');
+      world.restoresUsed = w.restoresUsed;
+    }
   }
   return {
     ...newSession(),

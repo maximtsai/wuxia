@@ -11,8 +11,6 @@ shared-tree scaffold, save v5 tree persistence, and independent preferences.
   Mentor, and replace temporary rank progression only after actual nodes and moves
   are approved.
 - Design update (2026-09-13), approved in [../tdd.md](../tdd.md) but not implemented:
-  - Make cleared Human Gateway stages non-replayable (the build currently allows
-    replays); keep Monster Portal and Dark Rift replays.
   - Give all classes identical per-level growth and narrower starting-stat differences;
     remove the per-level stat choice and class-specific level-up modifiers. Add a
     versioned save migration that drops stored stat choices and recomputes stats
@@ -24,8 +22,6 @@ shared-tree scaffold, save v5 tree persistence, and independent preferences.
     potion UI, and logs.
   - Support per-encounter limited-use techniques in content, commands, retries, UI, and
     logs.
-  - Remove boss-specific damage caps from ability math and tooltips.
-  - Lower respec pricing to very cheap.
   - Replace deliveries with authored mini-quests that fall back to repeatable
     deliveries once exhausted.
 - Break the remaining overworld/menu presentation out of `SliceScene.ts` as real
@@ -40,7 +36,8 @@ shared-tree scaffold, save v5 tree persistence, and independent preferences.
   that Human stages cannot be replayed. Automated balance simulations are removed
   while mechanics remain in flux.
 - Validate physical touch devices, Firefox, and WebKit; existing browser checks
-  cover Chromium, keyboard activation, and emulated touch with responsive layouts.
+  cover one Chromium flow: emulated touch combat on a phone layout. Keyboard play,
+  class selection, and save/continue are no longer browser-tested.
 - Replace geometric visuals when a theme is chosen; add loading/failure handling,
   animation/audio lifecycle, settings, and optimization when assets arrive.
 - Optional content expansion: armor and more shield items, richer NPC stories,

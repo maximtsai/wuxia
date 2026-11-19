@@ -1,10 +1,13 @@
-import { newWorld, roomBounds } from '../content/world';
+import { MONK_RESTORES, newWorld, roomBounds } from '../content/world';
 import { campaignReason, completeStage, travelThroughDoorway } from './world';
+import { frameSeconds } from './time';
 import {
   weapons,
   potions,
+  foods,
   type WeaponId,
   type PotionId,
+  type FoodId,
 } from '../content/catalog';
 import {
   classes,
@@ -92,6 +95,10 @@ function fighter(s: Session, id: string) {
     s.battle!.enemies.find((e) => e.id === id) ??
     (s.battle!.shadow?.id === id ? s.battle!.shadow : undefined)
   );
+}
+/** Display name for log lines: "You" for the player, otherwise the fighter's name. */
+function nameOf(s: Session, id: string) {
+  return id === 'player' ? 'You' : (fighter(s, id)?.name ?? id);
 }
 function alive(s: Session, id: string) {
   return id === 'player' ? s.player.life > 0 : (fighter(s, id)?.life ?? 0) > 0;
@@ -188,6 +195,7 @@ function newBattle(s: Session, id: string, token = 0) {
     eventSequence: 0,
     events: [],
     usesSpent: {},
+    earned: { gold: 0, xp: 0, levels: 0, cleared: false },
   };
   s.battle = b;
   b.openingOrder = createOpeningOrder(effectiveSpeed(s.player), b.enemies);
@@ -222,9 +230,11 @@ export function beginBattle(s: Session, id = 'practice') {
   newBattle(s, id);
   s.log = [
     encounters[id].training
-      ? 'Training: Energy and EXP resolve per damaging hit.'
+      ? 'Training: each hit costs Energy and earns EXP.'
       : 'Encounter entry: 10 Energy.',
-    `Opening turn: ${s.battle!.actor}. Speed only determines which side acts first.`,
+    s.battle!.actor === 'player'
+      ? 'You act first.'
+      : `${s.battle!.enemies.find((e) => e.id === s.battle!.actor)?.name ?? 'The enemy'} acts first.`,
   ];
   return true;
 }
@@ -234,9 +244,7 @@ export function retryPrepared(s: Session) {
   const { encounterId, token } = b;
   s.player = copyPlayer(b.prepared);
   newBattle(s, encounterId, token + 1);
-  s.log = [
-    'Prepared retry: original post-entry resources restored; no additional Energy fee.',
-  ];
+  s.log = ['Trying again, as you were when you entered. No extra Energy.'];
   return true;
 }
 export function slottedBottle(p: Player, slot: number) {
@@ -276,7 +284,7 @@ export function actionInfo(s: Session, id: CombatAction): ActionInfo {
   if (id === 'attack')
     return {
       name: 'Attack',
-      detail: `Free physical attack. One enemy; restores ${BASIC_ATTACK_QI_GAIN} Qi after resolving. Base power ${Math.floor(calculateActionPower(s.player, basicAttack, 'attack', 1, s.player.mana))} before defense and critical.`,
+      detail: `Free physical attack. One enemy; restores ${BASIC_ATTACK_QI_GAIN} Qi after resolving. Power ${Math.floor(calculateActionPower(s.player, basicAttack, 'attack', 1, s.player.mana))} before defense and critical.`,
       cost: 0,
       target: 'single' as const,
     };
@@ -295,7 +303,7 @@ export function actionInfo(s: Session, id: CombatAction): ActionInfo {
   );
   return {
     name: d.name,
-    detail: `${d.description}${d.percent !== undefined ? ` Deals ${d.percent}% of ${d.effect === 'avenger' ? 'your missing Life' : "the target's current Life"}.` : ''}${d.noCrit ? ' Cannot critically strike.' : ''}${d.hits ? ` Base power ${Math.floor(power)} per hit before defense and critical.` : ''} Rank ${rank}/10. Requires level ${d.level}${d.requires.length ? ', ' + d.requires.map((v) => skills[v as SkillId].name).join(', ') : ''}.`,
+    detail: `${d.description}${d.percent !== undefined ? ` Deals ${d.percent}% of ${d.effect === 'avenger' ? 'your missing Life' : "the target's current Life"}.` : ''}${d.noCrit ? ' Cannot critically strike.' : ''}${d.hits ? ` Power ${Math.floor(power)} per hit before defense and critical.` : ''}${d.effect === 'heal' ? ` Restores ${healAmount(s.player, rank)} Life.` : ''} Rank ${rank}/10. Requires level ${d.level}${d.requires.length ? ', ' + d.requires.map((v) => skills[v as SkillId].name).join(', ') : ''}.`,
     cost: d.cost,
     target: d.target,
     uses:
@@ -317,14 +325,9 @@ export function unavailable(
   if (!b || b.turn !== 'player') return 'Wait for your turn';
   if (id === 'potion0' || id === 'potion1') {
     const bottle = slottedBottle(p, id === 'potion0' ? 0 : 1);
-    if (!bottle) return 'Empty slot';
-    if (!bottle.charges) return 'Refill at the well';
-    const d = potions[bottle.type];
-    return (d.life && p.life < p.maxLife) ||
-      (d.mana && p.mana < p.maxMana) ||
-      (d.guard && b.guard < 2)
-      ? null
-      : 'No effect can apply';
+    if (!bottle) return 'Buy at the potion seller';
+    // Drinkable at full Life and Qi: potions may carry other effects.
+    return bottle.charges ? null : 'Refill at the well';
   }
   if (id !== 'attack') {
     if (!Object.hasOwn(skills, id)) return 'Unknown skill';
@@ -398,11 +401,19 @@ function gainQi(s: Session, amount: number, source: string) {
   });
   log(s, `${source}: restored ${gained} Qi.`);
 }
+/** Life restored by Heal at `rank`, capped at full Life. */
+export function healAmount(p: Player, rank: number) {
+  return Math.floor(p.maxLife * Math.min(1, 0.13 + 0.12 * rank));
+}
 function experience(s: Session, amount: number) {
   const levels = addExperience(s.player, amount);
+  if (s.battle) {
+    s.battle.earned.xp += amount;
+    s.battle.earned.levels += levels;
+  }
   log(
     s,
-    `+${amount} EXP${levels ? `; reached level ${s.player.level}. Resources restored; allocate points in Progression.` : '.'}`,
+    `+${amount} EXP${levels ? `; reached level ${s.player.level}. Resources restored; spend points in Character and the Skill Tree.` : '.'}`,
   );
 }
 function status(s: Session, id: string, kind: Status['kind'], power: number) {
@@ -418,7 +429,7 @@ function status(s: Session, id: string, kind: Status['kind'], power: number) {
     status: kind,
     turns: 2,
   });
-  log(s, `${kind} applied to ${id} for 2 turns.`);
+  log(s, `${nameOf(s, id)}: ${kind} for 2 turns.`);
 }
 function hit(
   s: Session,
@@ -473,9 +484,10 @@ function hit(
     channel: kind === 'magic' ? 'qi' : 'physical',
     shieldAbsorbed,
   });
+  const blocked = Math.max(0, Math.floor(raw) - initial);
   log(
     s,
-    `${id}: ${amount} Life damage (${Math.max(0, Math.floor(raw) - initial)} defense mitigation).`,
+    `${nameOf(s, id)} ${id === 'player' ? 'take' : 'takes'} ${amount} damage${blocked ? ` (${blocked} blocked)` : ''}.`,
   );
   return initial > 0;
 }
@@ -498,14 +510,17 @@ function settlement(s: Session) {
     if (!definition(s).training) {
       const d = definition(s);
       s.player.gold += d.gold;
+      b.earned.gold += d.gold;
       s.player.wins++;
-      if (completeStage(s, b.encounterId))
+      if (completeStage(s, b.encounterId)) {
+        b.earned.cleared = true;
         log(s, 'New campaign stage cleared. Next stage unlocked.');
+      }
       experience(s, d.xp);
       if (!s.player.inventory.includes('earned'))
         s.player.inventory.push('earned');
-      log(s, `Victory! +${d.gold} gold. Rewards settled once.`);
-    } else log(s, 'Training complete. No gold or item rewards.');
+      log(s, `Victory! +${d.gold} gold.`);
+    } else log(s, 'Training complete.');
     return true;
   }
   return false;
@@ -518,7 +533,7 @@ function finishTurn(s: Session) {
     if (effect.kind === 'burn' && alive(s, id))
       hit(s, id, effect.power, 'magic');
     effect.turns--;
-    if (!effect.turns) log(s, `${id}: ${effect.kind} expired.`);
+    if (!effect.turns) log(s, `${nameOf(s, id)}: ${effect.kind} wore off.`);
   }
   if (id === 'player') b.statuses = list.filter((v) => v.turns > 0);
   else if (fighter(s, id))
@@ -583,8 +598,7 @@ export function act(
       );
     }
     log(s, `${d.name}: ${d.effect === 'manaBomb' ? mana : d.cost} Qi spent.`);
-    if (d.effect === 'heal')
-      recover(s, Math.floor(p.maxLife * Math.min(1, 0.13 + 0.12 * rank)), 0);
+    if (d.effect === 'heal') recover(s, healAmount(p, rank), 0);
     else if (d.effect === 'charge') recover(s, 0, 25 * rank);
     else if (d.effect === 'summon') {
       b.shadow = {
@@ -603,7 +617,7 @@ export function act(
         behavior: 'shadow',
       };
       b.openingOrder = addShadowToOrder(b.openingOrder);
-      log(s, 'Shadow summoned; joins the fixed turn cycle next round.');
+      log(s, 'Your shadow will join next round.');
     } else {
       const targets =
         d.target === 'all'
@@ -746,7 +760,6 @@ export function enemyAct(s: Session, random: () => number = Math.random) {
 export function returnToRoom(s: Session) {
   if (!s.battle || ['enemy', 'shadow'].includes(s.battle.turn)) return false;
   s.battle = null;
-  log(s, 'Returned to the room. Remaining resources carry over.');
   return true;
 }
 export function rest(s: Session) {
@@ -766,6 +779,48 @@ export function equip(s: Session, id: WeaponId) {
   )
     return false;
   s.player.weapon = id;
+  return true;
+}
+/** Why a dish cannot be bought and eaten right now, or null when it can. */
+export function eatReason(s: Session, id: FoodId) {
+  const p = s.player,
+    f = foods[id];
+  if (s.battle) return 'Return to the room first';
+  if (p.gold < f.price) return `Needs ${f.price} gold`;
+  if (p.life === p.maxLife && p.mana === p.maxMana && p.energy === p.maxEnergy)
+    return 'Already fully restored';
+  return null;
+}
+export function eat(s: Session, id: FoodId) {
+  if (!Object.hasOwn(foods, id) || eatReason(s, id)) return false;
+  const p = s.player,
+    f = foods[id];
+  p.gold -= f.price;
+  p.energy = Math.min(p.maxEnergy, p.energy + f.energy);
+  p.life = Math.min(p.maxLife, p.life + f.life);
+  p.mana = Math.min(p.maxMana, p.mana + f.mana);
+  log(s, `Ate ${f.name}.`);
+  return true;
+}
+/** Spends one of the monk's lifetime full restores; refuses when nothing is missing. */
+export function meditateReason(s: Session) {
+  const p = s.player;
+  if (s.battle) return 'Return to the room first';
+  if (s.world.restoresUsed >= MONK_RESTORES) return 'No restores left';
+  if (p.life === p.maxLife && p.mana === p.maxMana && p.energy === p.maxEnergy)
+    return 'Already fully restored';
+  return null;
+}
+export function meditate(s: Session) {
+  if (meditateReason(s)) return false;
+  s.player.life = s.player.maxLife;
+  s.player.mana = s.player.maxMana;
+  s.player.energy = s.player.maxEnergy;
+  s.world.restoresUsed++;
+  log(
+    s,
+    `Life, Qi and Energy fully restored. ${MONK_RESTORES - s.world.restoresUsed} restores remain.`,
+  );
   return true;
 }
 export function refill(s: Session) {
@@ -801,24 +856,41 @@ export function slotPotion(s: Session, slot: number, id: string | null) {
   s.player.potionSlots[slot] = id;
   return true;
 }
+/** Walking pace in units per second, and the longest slice resolved at once. */
+const WALK_SPEED = 270,
+  MAX_SLICE = 0.05;
 export function move(s: Session, x: number, y: number, seconds: number) {
   if (s.battle) return;
-  const dx = x - s.position.x,
-    dy = y - s.position.y,
-    d = Math.hypot(dx, dy);
-  if (!d) return;
-  const step = Math.min(d, 270 * Math.min(Math.max(seconds, 0), 0.05));
-  s.position = {
-    x: Math.min(
-      roomBounds.right,
-      Math.max(roomBounds.left, s.position.x + (dx / d) * step),
-    ),
-    y: Math.min(
-      roomBounds.bottom,
-      Math.max(roomBounds.top, s.position.y + (dy / d) * step),
-    ),
-  };
-  travelThroughDoorway(s);
+  // A slow frame still covers its full distance, but in slices short enough
+  // that the walk cannot step straight over a doorway. Frames longer than
+  // `MAX_FRAME_SECONDS` slow the walk down rather than teleporting the player.
+  let remaining = frameSeconds(seconds * 1000);
+  const room = s.world.room;
+  while (remaining > 0) {
+    const slice = Math.min(remaining, MAX_SLICE);
+    remaining -= slice;
+    const dx = x - s.position.x,
+      dy = y - s.position.y,
+      d = Math.hypot(dx, dy);
+    if (!d) return;
+    const step = Math.min(d, WALK_SPEED * slice);
+    s.position = {
+      x: Math.min(
+        roomBounds.right,
+        Math.max(roomBounds.left, s.position.x + (dx / d) * step),
+      ),
+      y: Math.min(
+        roomBounds.bottom,
+        Math.max(
+          s.world.room === 'potions' ? 490 : roomBounds.top,
+          s.position.y + (dy / d) * step,
+        ),
+      ),
+    };
+    travelThroughDoorway(s);
+    // Arriving in the next room ends this frame's walk at its entrance.
+    if (s.world.room !== room) return;
+  }
 }
 export function normalizePlayer(p: Player) {
   syncStats(p);

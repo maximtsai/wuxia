@@ -80,6 +80,8 @@ export interface Battle {
   events: CombatEvent[];
   /** Uses spent this encounter by limited-use techniques. */
   usesSpent: Partial<Record<SkillId, number>>;
+  /** What this encounter has granted so far, for the end-of-fight summary. */
+  earned: { gold: number; xp: number; levels: number; cleared: boolean };
 }
 export interface Session {
   world: WorldState;

@@ -126,6 +126,7 @@ describe('content and progression', () => {
     const before = JSON.stringify(s.player),
       v = respecPreview(s.player);
     expect(JSON.stringify(s.player)).toBe(before);
+    expect(v.price).toBe(s.player.level);
     const gold = s.player.gold;
     expect(respec(s.player)).toBe(true);
     expect(s.player.gold).toBe(gold - v.price);
@@ -235,7 +236,7 @@ describe('combat and Energy', () => {
     const mp = t.player.mana;
     act(t, 'doubleStrike', t.battle!.token, noCrit);
     expect(t.player.mana).toBe(mp - skills.doubleStrike.cost);
-    expect(t.log.filter((l) => l.includes('Life damage'))).toHaveLength(2);
+    expect(t.battle!.events.filter((e) => e.type === 'damage')).toHaveLength(2);
   });
   it('shields absorb damage and shield-specific bonuses do not multiply Life damage', () => {
     const s = ready();
@@ -416,6 +417,22 @@ describe('potions and saves', () => {
     expect(s.player.bottles[2].charges).toBe(potions.hybrid.charges - 1);
     refill(s);
     expect(s.player.bottles[2].charges).toBe(potions.hybrid.charges);
+  });
+  it('drinks at full Life and Qi (potions may carry other effects); empty slots explain why not', () => {
+    const s = ready();
+    beginBattle(s);
+    playerTurn(s);
+    const bottle = s.player.bottles.find(
+      (b) => b.id === s.player.potionSlots[0],
+    )!;
+    const charges = bottle.charges;
+    expect(s.player.life).toBe(s.player.maxLife);
+    expect(unavailable(s, 'potion0')).toBeNull();
+    expect(act(s, 'potion0', s.battle!.token)).toBe(true);
+    expect(bottle.charges).toBe(charges - 1);
+    s.player.potionSlots[1] = null;
+    playerTurn(s);
+    expect(unavailable(s, 'potion1')).toMatch(/potion seller/);
   });
   it('round-trips a valid levelled build and refuses malformed ranks/slots', () => {
     const s = ready();

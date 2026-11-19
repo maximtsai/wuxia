@@ -14,10 +14,10 @@ export const theme = {
   player: 'Traveler',
   enemy: 'Sparring sentinel',
   colors: {
-    background: 0x171e27,
-    floor: 0x263342,
-    line: 0x45586b,
-    player: 0x99c9c0,
+    background: 0x1a130c,
+    floor: 0x3a2a1a,
+    line: 0x5e462c,
+    player: 0xe3bf6c,
     enemy: 0xd9ad86,
   },
   weapons: {
@@ -73,3 +73,24 @@ export const potions = {
   },
 } as const;
 export type PotionId = keyof typeof potions;
+/** Food seller's menu, eaten on the spot: mostly Energy, a little Life and Qi. */
+export const foods = {
+  riceBall: { name: 'Rice ball', energy: 10, life: 4, mana: 2, price: 5 },
+  dumplings: {
+    name: 'Tea and dumplings',
+    energy: 18,
+    life: 5,
+    mana: 6,
+    price: 10,
+  },
+  noodles: { name: 'Noodle soup', energy: 25, life: 10, mana: 4, price: 16 },
+  fish: {
+    name: 'Grilled river fish',
+    energy: 35,
+    life: 14,
+    mana: 6,
+    price: 24,
+  },
+  feast: { name: 'Temple feast', energy: 50, life: 20, mana: 10, price: 40 },
+} as const;
+export type FoodId = keyof typeof foods;

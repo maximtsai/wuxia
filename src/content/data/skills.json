@@ -33,7 +33,7 @@
     "target": "single",
     "hits": 2,
     "power": 8,
-    "description": "Strike one enemy twice. Costs are paid once."
+    "description": "Strike one enemy twice."
   },
   "speedStrike": {
     "name": "Speed Strike",
@@ -83,7 +83,7 @@
     "hits": 1,
     "power": 18,
     "effect": "shield",
-    "description": "Deal additional damage to a shield without multiplying Life damage."
+    "description": "Extra damage against shields."
   },
   "manaBomb": {
     "name": "Qi Burst",
@@ -189,7 +189,7 @@
     "hits": 0,
     "power": 0,
     "effect": "heal",
-    "description": "Restore Max Life × (0.13 + 0.12 × rank), capped at full Life."
+    "description": "Restore Life. Heals more with each rank."
   },
   "shadowReplicate": {
     "name": "Shadow Replicate",
@@ -202,7 +202,7 @@
     "hits": 0,
     "power": 0,
     "effect": "summon",
-    "description": "Summon one allied shadow. It joins the fixed cycle next round and can be targeted."
+    "description": "Summon a shadow ally. It joins the fight next round, and enemies can attack it."
   },
   "shadowBlend": {
     "name": "Lightfoot Steps",

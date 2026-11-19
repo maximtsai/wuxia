@@ -3,45 +3,46 @@ const portraits: Record<
   ClassId,
   { file: string; accent: string; role: string; description: string }
 > = {
-  balanced: {
-    file: 'wanderer',
-    accent: '#87c6a3',
-    role: 'An unwritten path',
-    description:
-      'You were born with no specialty, but your potential is yours to shape. Even growth in every direction gives you the freedom to forge your own fighting style.',
-  },
   warrior: {
     file: 'warrior',
     accent: '#eb836d',
-    role: 'Strength & endurance',
-    description:
-      'Meet danger head-on. Strong physical attacks, sturdy defenses, and greater Life growth reward a direct, relentless fighting style.',
+    role: 'Strength and endurance',
+    description: 'Hits hard and shrugs off blows. Strength drives your damage.',
   },
   caster: {
     file: 'caster',
     accent: '#bfe7fa',
-    role: 'Qi & inner cultivation',
+    role: 'Qi techniques',
     description:
-      'Turn preparation into power. A deep Qi reserve and strong inner cultivation support palm techniques, recovery, and sustained qi attacks. Gather Qi is yours from the start.',
+      'The largest Qi pool. Qi techniques do the damage, and Gather Qi keeps you going.',
   },
   shadow: {
     file: 'shadow',
     accent: '#edc65a',
-    role: 'Speed & precision',
-    description:
-      'Strike before your enemy can react. Speed-focused growth helps secure the opening turn and improves critical chance, while Lightfoot Steps sharpens your natural advantage.',
+    role: 'Speed and critical hits',
+    description: 'Speed helps you act first and land critical strikes.',
+  },
+  balanced: {
+    file: 'wanderer',
+    accent: '#87c6a3',
+    role: 'Even stats',
+    description: 'Grows evenly, so any build works.',
   },
 };
-export function classSelection(notice: string) {
-  return `<div class="class-screen"><div class="class-heading"><span class="class-eyebrow">Before the journey</span><h1>Choose your path</h1><p>Your journey through the jianghu begins here.</p></div><div class="class-columns">${(
+export function classSelection(
+  notice: string,
+  selected: ClassId | null = null,
+) {
+  const art = selected ? portraits[selected] : null;
+  const c = selected ? classes[selected] : null;
+  return `<div class="class-screen"><div class="class-heading"><h1>Choose your path</h1><button class="class-continue" data-command="load">Continue saved game ↗</button></div><div class="class-columns" role="group" aria-label="Choose a class">${(
     ['warrior', 'caster', 'shadow', 'balanced'] as ClassId[]
   )
-    .map((id, i) => {
-      const c = classes[id],
-        art = portraits[id];
-      return `<article class="class-column" style="--class-accent:${art.accent}" tabindex="0" aria-label="${c.name} class preview" aria-describedby="class-tip-${id}"><img src="${import.meta.env.BASE_URL}images/classes/${art.file}-stick-wuxia.png" alt="${c.name} Shaolin stick fighter portrait" width="1024" height="1536"><div class="class-shade"></div><span class="class-number">0${i + 1}</span><div class="class-tooltip" id="class-tip-${id}" role="tooltip"><strong>${c.name}</strong><p>${art.description}</p><small>Life ${c.life} · Qi ${c.mana}<br>Strength ${c.strength} · Speed ${c.speed}<br>Starts with ${skills[c.starter].name}</small></div><div class="class-caption"><h2>${c.name}</h2><p>${art.role}</p><button data-command="class" data-value="${id}" aria-label="Choose ${c.name}">Choose ${c.name}<span aria-hidden="true"> ↗</span></button></div></article>`;
+    .map((id) => {
+      const a = portraits[id];
+      return `<button type="button" class="class-column" style="--class-accent:${a.accent}" data-command="preview-class" data-value="${id}" aria-label="Choose ${classes[id].name}" aria-pressed="${selected === id}"><img src="${import.meta.env.BASE_URL}images/classes/${a.file}-stick-wuxia.png" alt="" width="1024" height="1536"><span class="class-shade"></span><span class="class-check" aria-hidden="true">✓</span><span class="class-caption"><span class="class-name">${classes[id].name}</span><span class="class-tagline">${a.role}</span></span></button>`;
     })
     .join(
       '',
-    )}</div><footer class="class-footer"><p>Hover or focus to discover a class. Tap a portrait on touch screens.<br>Your class is permanent. Stats and skills can be respecced later.</p><button data-command="load" data-value="">Load saved progress</button></footer><p id="notice" role="status">${notice}</p></div>`;
+    )}</div><div class="class-decision" style="--class-accent:${art?.accent ?? '#bfe7fa'}"><div class="class-summary"><p id="class-description" aria-live="polite">${art ? art.description : 'Pick a class. All four share one skill tree.'}</p>${c ? `<details class="class-details"><summary>Starting details</summary><p>Life ${c.life} · Qi ${c.mana} · Strength ${c.strength} · Speed ${c.speed}<br>Starts with ${skills[c.starter].name}. All classes can explore the shared skill tree.</p></details>` : ''}</div><button class="class-begin" data-command="class" data-value="${selected ?? ''}" ${selected ? '' : 'disabled'}>Begin journey <span aria-hidden="true">→</span></button></div><p class="class-permanent">Your class can’t be changed later; stats and skills can.</p><p id="notice" role="status">${notice}</p></div>`;
 }

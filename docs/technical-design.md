@@ -53,7 +53,7 @@ exceptions are the Avenger and Cut Down technique nodes and their child masterie
 Each level requires 50 × current level EXP, grants one stat choice and one Skill
 Point, and adds 5 maximum Life, 5 Qi, and 3 Energy. Every fifth level adds 2
 Strength, 2 Speed, and another Skill Point. Stat-choice growth differs by class.
-Level-ups restore resources; level caps at 99. Respec costs 2 gold per level,
+Level-ups restore resources; level caps at 99. Respec costs 1 gold per level,
 refunds allocations, preserves earned progress and the starter, clamps resources
 without healing, and removes incompatible equipment. Previewing does not mutate
 state, and empty resets cannot charge gold.
@@ -129,9 +129,11 @@ one worker. `npm run test:e2e` is the standalone build-and-browser-test command;
 documentation-only work, use `npm run check:docs` rather than starting the build
 and browser suite. Tests cover all 16 actions,
 classes, progression, respecs, shields/statuses/summons, Energy, rewards, training,
-potions, migration, and retries. Browser tests include keyboard activation,
-emulated touch targeting, and desktop/tablet/phone layouts. Physical devices and
-other browsers remain release validation.
+potions, migration, and retries. Unit tests read balance values from content
+data rather than pinning them, so tuning does not break them. The browser suite
+is kept to one flow that needs a real page (touch combat on a phone layout);
+game rules belong in unit tests. On Windows it renders through the GPU. Physical
+devices and other browsers remain release validation.
 
 ## Phase 3 world and campaign
 
@@ -139,14 +141,19 @@ other browsers remain release validation.
 one ending), 35 portal stages, and typed world state. `core/world.ts` validates
 connected travel, gates, sequential clears, deliveries, and room-specific stock.
 The scene displays exits and a schematic map in the same arrangement as the source.
-Exits perform free room transitions; clicking a service approaches its landmark.
+Room objects (`interactables` in `content/world.ts`) show a card with a name,
+one-line blurb and actions only while the player stands within
+`interactRadius`; E uses the first action and clicking an object walks to its
+stand spot. Doorways carry small in-world signs and travel on contact; the map
+offers the same free transitions to neighbouring rooms.
 The upstairs Mentor hosts respecs. Stat and skill allocation remains portable.
 
 Human Gateway has 20 stages, Monster Portal 10, and Dark Rift 5. Clear each portal
-in order, with previous stages replayable. Human 20 unlocks the ending and Rift;
-Monster remains optional. The ending permits return to unfinished content. Victory
-settlement records new clearance once, while replays grant the advertised normal
-rewards. Prepared retries retain world state and restore only paid preparation.
+in order. Cleared Human Gateway stages cannot be replayed (the encounter list
+shows them disabled); cleared Monster Portal and Dark Rift stages can. Human 20
+unlocks the ending and Rift; Monster remains optional. The ending permits return to
+unfinished content. Victory settlement records new clearance once, while Monster
+and Rift replays grant the advertised normal rewards. Prepared retries retain world state and restore only paid preparation.
 
 Campaign EXP is 50 × suggested level, gold is 12 + 5 × suggested level. Three
 behavior archetypes and single/duo/shield variations generate the stage roster.
@@ -169,9 +176,10 @@ coordinates. No SDK, autosave, or external assets were added.
 ## Class selection presentation
 
 A separate opening screen precedes the overworld. Four generated portraits in
-`public/images/classes/` use grayscale at rest and class-colored hover/focus
-lighting, with descriptive tooltips and explicit choice buttons. Touch users can
-focus portraits before choosing. Phones use two rows for legibility. World art
+`public/images/classes/` retain subdued color at rest and full color when selected.
+Whole-card buttons preview a class without committing; one Begin journey button
+confirms the choice. A short description and expandable starting details replace
+hover tooltips. Keyboard and touch use the same flow; phones use two rows. World art
 remains independent. Balanced is now displayed as Wanderer; its stable save ID
 `balanced`, stats, and growth remain unchanged. Legacy saves need no migration.
 
@@ -233,3 +241,47 @@ Effect types:
 Stats: `strength`, `speed`, `maxLife`, `maxMana`, `maxEnergy`, `defense`,
 `qiDefense`, `physicalPower`, `qiPower`. Granted ranks do not satisfy
 prerequisites for learning skills with Skill Points.
+
+## Market room and overworld HUD
+
+The Potions & Food room uses local assets in `public/images/rooms/market/`:
+`background.png`, `potion-table.png`, `food-table.png`, and `well.png`.
+The props retain transparency and are layered in front of seller characters.
+Potion seller is on the left, food seller on the right, refill well beside the
+potion stand. The market walking area begins at y=490, keeping the player in
+front of counters while leaving all three exits reachable.
+
+The UI shows only what the immediate situation needs, and stays navigable by mouse
+or touch alone. The overworld has a compact HUD (a thin EXP bar under the level, Life, Qi and
+Training Energy), a
+centered room title, and gold plus a labelled ☰ Menu button top right. Map,
+Journal, Character, Equipment, Skill tree and Pause live in that menu (O toggles
+it; M/J/C/I/K and Esc still work directly; any click outside closes it).
+Character and Skill Tree buttons with badges appear bottom right only while stat
+choices or Skill Points are unspent. Interaction cards have a × close button.
+Two bottle slots with charge pips sit at bottom center in every room, showing Empty when a slot has no bottle; drinking is still a combat
+action. In combat the panel shows the turn, a Life/Qi strip (shield, Energy,
+guard and statuses only when present), target buttons only when two or more
+enemies live, the turn order when three or more fighters act, the latest log
+line, and the actions. Enemy Qi stays on the canvas because enemy moves cost Qi. Both potion slots always
+appear: filled ones show charges and can be drunk even at full Life and Qi
+(potions may gain other effects); empty ones point to the potion seller. Pause
+and Retreat sit behind ☰ and the full log is collapsed. Hovering, focusing or
+long-pressing (touch) an action shows its details in place of the latest log line.
+Combat fits one screen: the battlefield takes the height the panel leaves, and its
+Life bars and labels are sized to stay legible when it shrinks. Victory and the end
+of training summarise what the encounter granted (gold, EXP, level-ups, a first
+clear). Encounter lists show the cleared count and the next stage; cleared Monster
+and Dark Rift stages follow as replays. The Character menu shows stat choices as
+buttons while some wait, otherwise just the stats, and the respec section only
+upstairs. Notices fade after about four seconds. A new game shows a key-cap
+walking hint (WASD, arrows, or a click; a tap icon on touch) until the player first
+moves. Skill buttons carry a key-cap badge for their 1–9 hotkey. Key caps
+(`.kbd-only`) hide on coarse-pointer touch screens, where `.touch-only` cues show
+instead. Combat log lines name fighters ("Thief takes 30 damage.") rather than
+internal ids. Nearby services have an
+accessible E/tap prompt; existing interaction cards and shop panels remain.
+Phones place controls below the room to keep text and touch targets readable.
+
+Art generation prompts are recorded in `docs/market-art-prompts.md`; the approved
+concept is saved at `references/market-ui-concept.png`.
