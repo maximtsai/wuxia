@@ -1,0 +1,19 @@
+# Market room artwork
+
+Generated with the built-in image generation tool. Background and transparent prop PNGs are stored in public/images/rooms/market/. Original generated alpha is preserved. UI reference: references/market-ui-concept.png.
+
+## market-room
+
+Simple MS Paint-like 2D wuxia browser game art: bold dark brown outlines, flat solid color fills, limited muted warm palette, basic polygon and ellipse shapes, slightly imperfect hand-drawn lines. Intentionally low detail, like an achievable amateur Flash game background. NO painterly texture, gradients, grain, realistic lighting, ornate detail, text, UI, or characters. Frontal slightly elevated game view, see tops of objects. Create a 16:9 empty rectangular Chinese wooden market room background. Back wall occupies top 35 percent, warm ochre open wooden floor fills bottom 65 percent. Two plain paper lattice windows at upper left and upper right, three simple wall lanterns. Dark timber beams. Very few floor plank lines. Clear bottom-center doorway opening and clear left/right side openings at 62 percent height. Plenty of blank space on floor for separate merchant tables and moving player sprites. No tables, bottles, food, wells, people, plants or furniture. Whole room fills image edge to edge.
+
+## potion-table
+
+Simple MS Paint-like 2D wuxia browser game art: bold dark brown outlines, flat solid color fills, limited muted warm palette, basic polygon and ellipse shapes, slightly imperfect hand-drawn lines. Intentionally low detail, like an achievable amateur Flash game background. NO painterly texture, gradients, grain, realistic lighting, ornate detail, text, UI, or characters. Frontal slightly elevated game view, see tops of objects. Single isolated potion merchant table sprite on genuinely transparent background. Wide wooden counter with visible top and short front panel, simple legs. Muted plum cloth laid across top. Five simple glass potion bottles colored red, amber, blue, green, violet. Broad flat horizontal tabletop. Compact 3:1 object silhouette centered in landscape canvas, tightly framed with small transparent margins. No shadow outside object. No seller.
+
+## food-table
+
+Simple MS Paint-like 2D wuxia browser game art: bold dark brown outlines, flat solid color fills, limited muted warm palette, basic polygon and ellipse shapes, slightly imperfect hand-drawn lines. Intentionally low detail, like an achievable amateur Flash game background. NO painterly texture, gradients, grain, realistic lighting, ornate detail, text, UI, or characters. Frontal slightly elevated game view, see tops of objects. Single isolated food merchant table sprite on genuinely transparent background. Wide wooden counter with visible top and short front panel, simple legs. Muted olive cloth laid across top. Two white plates with simple round dumplings, small dark pot and ladle, three cups and a tall blue jug. Broad flat horizontal tabletop. Compact 3:1 object silhouette centered in landscape canvas, tightly framed with small transparent margins. No shadow outside object. No seller.
+
+## refill-well
+
+Simple MS Paint-like 2D wuxia browser game art: bold dark brown outlines, flat solid color fills, limited muted warm palette, basic polygon and ellipse shapes, slightly imperfect hand-drawn lines. Intentionally low detail, like an achievable amateur Flash game background. NO painterly texture, gradients, grain, realistic lighting, ornate detail, text, UI, or characters. Frontal slightly elevated game view, see tops of objects. Single isolated small stone refill well sprite on genuinely transparent background. Circular squat grey stone basin with flat pale blue water, short simple bamboo spout curving over it. Only a few large stone blocks. No roof, no rope, no bucket, no surroundings. Tight square framing with small transparent margins.
